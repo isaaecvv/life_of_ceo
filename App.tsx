@@ -32,7 +32,8 @@ type BridgeMessage =
   | { type: 'speechStart' }
   | { type: 'speechStop' }
   | { type: 'backup'; data: string; name: string }
-  | { type: 'restore' };
+  | { type: 'restore' }
+  | { type: 'ai'; id: string; url: string; headers: Record<string, string>; body: string };
 
 const stateFile = () => new File(Paths.document, 'state.json');
 
@@ -176,6 +177,26 @@ export default function App() {
           } catch {
             run(`window.__notify("Не получилось сохранить копию.")`);
           }
+          break;
+        }
+        case 'ai': {
+          // Запрос к ИИ делаем из нативной части: здесь нет ограничений браузера (CORS)
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 70000);
+          let ok = false;
+          let status = 0;
+          let text = '';
+          try {
+            const r = await fetch(msg.url, { method: 'POST', headers: msg.headers, body: msg.body, signal: ctrl.signal });
+            ok = r.ok;
+            status = r.status;
+            text = await r.text();
+          } catch (e) {
+            text = ctrl.signal.aborted ? 'timeout' : String(e);
+          } finally {
+            clearTimeout(timer);
+          }
+          run(`window.__aiResult(${JSON.stringify(msg.id)}, ${ok}, ${status}, ${JSON.stringify(text)})`);
           break;
         }
         case 'restore': {

@@ -346,6 +346,21 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 .kb .composer{bottom:calc(var(--kb) + 8px)}
 .kb .sheet.on{bottom:var(--kb);max-height:calc(100% - var(--kb) - var(--sat) - 8px);padding-bottom:16px}
 .backup{display:flex;gap:10px;margin-top:8px}
+.aibox{background:var(--raise2);border-radius:18px;padding:14px;margin-top:8px}
+.aibox .inp{background:var(--raise);margin-top:8px}
+.aibox .pills .pill{background:var(--raise)}
+.aibox .pills .pill.on{background:var(--text)}
+.aibox .btn.sec{background:var(--raise)}
+.aistat{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);margin-top:10px}
+.aistat i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.aistat.ok i{background:var(--plus)}
+.aistat.bad i{background:var(--danger)}
+.msg.bot.typing{color:var(--muted)}
+.msg.bot.typing span{display:inline-block;animation:blink 1.2s infinite}
+.msg.bot.typing span:nth-child(2){animation-delay:.2s}
+.msg.bot.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.msg .via{display:block;font-size:12px;color:var(--faint);margin-top:6px}
 .backup .btn{height:48px;font-size:15px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -621,6 +636,21 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       <div class="gt2"><b>Google Календарь</b><span>Не подключён</span></div>
       <button id="gcBtn">Подключить</button>
     </div>
+    <div class="lbl">ИИ-ассистент</div>
+    <div class="aibox">
+      <div class="pills" id="aiProv"></div>
+      <div id="aiYandex">
+        <input class="inp" id="aiFolder" placeholder="ID каталога (b1g…)" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div id="aiCustom" class="hide">
+        <input class="inp" id="aiBase" placeholder="Адрес API, например https://openrouter.ai/api/v1" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <input class="inp" id="aiKey" type="password" placeholder="Ключ API" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <input class="inp" id="aiModel" placeholder="Модель" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="aistat" id="aiStat"><i></i><span></span></div>
+      <div class="backup"><button class="btn sec" id="aiCheck">Проверить</button><button class="btn sec" id="aiSave">Сохранить</button></div>
+    </div>
+    <p class="note">Ключ хранится только на этом телефоне и не попадает в резервную копию.</p>
     <div class="lbl">Режим дня, чтобы считать свободное время</div>
     <div class="sleeprow">
       <label>Подъём<input type="time" class="inp" id="setWake"></label>
@@ -718,6 +748,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   let state = load();
   if (!state){ state = fresh(); save(); }
   state.reflect ||= {};
+  state.settings.ai ||= { provider:'yandex', key:'', folder:'', base:'', model:'qwen3.6-35b-a3b' };
 
   let sel = todayKey(), monthCursor = fromKey(sel), monthOpen = false, view = 'day';
 
@@ -1064,7 +1095,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     pills('setWater', [2,2.5,3,3.5].map(n=>[n, fmtNum(n,1)+' л']), state.settings.waterL, 'w');
     pills('setSleepGoal', [7,7.5,8,9].map(n=>[n, fmtNum(n,1)+' ч']), state.settings.sleepGoal, 'sg');
   }
-  $('gear').onclick = () => { renderSettings(); openSheet($('setSheet')); };
+  $('gear').onclick = () => { renderSettings(); renderAISettings(); openSheet($('setSheet')); };
   $('gcBtn').onclick = () => notify('Google Календарь подключим следующим шагом, вместе с ИИ.');
   $('setWake').onchange = e => { state.settings.wake = e.target.value || '08:00'; save(); renderAll(); };
   $('setSleep').onchange = e => { state.settings.sleep = e.target.value || '23:30'; save(); renderAll(); };
@@ -1848,8 +1879,8 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     $('chat').innerHTML = state.chat.map(m => {
       if (m.who==='me') return m.img ? `<div class="msg me photo"><img src="${m.img}" alt="Фото"></div>` : `<div class="msg me">${esc(m.text)}</div>`;
       const list = m.list && m.list.length ? `<div class="added">${m.list.map(t=>`<div><span>${esc(t.l ?? '—')}</span>${esc(t.t ?? '')}</div>`).join('')}</div>` : '';
-      return `<div class="msg bot">${esc(m.text)}${list}</div>`;
-    }).join('');
+      return `<div class="msg bot">${esc(m.text)}${list}${m.via ? `<span class="via">${esc(m.via)}</span>` : ''}</div>`;
+    }).join('') + (aiBusy ? '<div class="msg bot typing">Думаю<span>.</span><span>.</span><span>.</span></div>' : '');
     $('hints').style.display = state.chat.length ? 'none' : '';
     requestAnimationFrame(()=>{ $('screen').scrollTop = $('screen').scrollHeight; });
   }
@@ -1858,11 +1889,33 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     if (state.chat.length > 80) state.chat = state.chat.slice(-80);
     save(); renderChat(); renderAll();
   }
-  function send(text){
-    text = (text||'').trim(); if (!text) return;
-    let r;
-    try { r = assistant(text); } catch(e){ console.error(e); r = { text:'Что-то пошло не так. Попробуй сказать по-другому.' }; }
-    pushChat({who:'me', text}, {who:'bot', text:r.text, list:r.list||[]});
+  function localReply(text){
+    try { return assistant(text); } catch(e){ console.error(e); return { text:'Что-то пошло не так. Попробуй сказать по-другому.' }; }
+  }
+  async function send(text, image){
+    text = (text||'').trim(); if (!text && !image) return;
+    if (aiBusy) return;
+    const useAI = aiReady() && isOnline();
+    if (!useAI){
+      if (image){ pushChat({who:'me', img:image.thumb}, {who:'bot', text: isOnline() ? 'Фото разбирает ИИ. Подключи его в настройках, и я смогу читать расписание, еду и чеки.' : 'Сейчас нет интернета, а фото разбирает ИИ. Отправь фото ещё раз, когда появится сеть.'}); return; }
+      const r = localReply(text);
+      pushChat({who:'me', text}, {who:'bot', text:r.text, list:r.list||[]});
+      return;
+    }
+    pushChat(image ? {who:'me', img:image.thumb} : {who:'me', text});
+    if (image && text) pushChat({who:'me', text});
+    aiBusy = true; renderChat();
+    let res;
+    try { res = await askAI(text, image ? image.full : null); }
+    catch(e){ res = { error: e && e.message ? e.message : String(e) }; }
+    aiBusy = false;
+    if (res.error){
+      if (image){ pushChat({who:'bot', text:`ИИ сейчас недоступен (${res.error}). Попробуй отправить фото чуть позже.`}); return; }
+      const r = localReply(text);
+      pushChat({who:'bot', text:r.text, list:r.list||[], via:`ИИ недоступен (${res.error}), ответил в базовом режиме`});
+      return;
+    }
+    pushChat({who:'bot', text:res.reply, list:res.list});
   }
   window.__lifeAssistant = t => { const r = assistant(t); renderAll(); return r; };
   window.__lifeState = () => state;
@@ -1872,17 +1925,258 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   $('input').addEventListener('input', autosize);
   $('hints').onclick = e => { const b = e.target.closest('.hint'); if (b) send(b.textContent); };
 
+  // =====================================================================
+  // ИИ: запрос к языковой модели и выполнение действий
+  // =====================================================================
+  let aiBusy = false;
+  const AI_PRESETS = { yandex: { label:'Yandex AI Studio', model:'qwen3.6-35b-a3b' }, custom: { label:'Другой сервис', model:'' } };
+  const aiCfg = () => state.settings.ai;
+  function aiReady(){
+    const a = aiCfg(); if (!a || !a.key || !a.model) return false;
+    return a.provider==='yandex' ? !!a.folder : !!a.base;
+  }
+  function aiRequest(messages){
+    const a = aiCfg();
+    if (a.provider==='yandex'){
+      const model = a.model.startsWith('gpt://') ? a.model : `gpt://${a.folder}/${a.model}`;
+      return { url:'https://ai.api.cloud.yandex.net/v1/chat/completions',
+        headers:{ 'Content-Type':'application/json', 'Authorization':`Api-Key ${a.key}`, 'OpenAI-Project': a.folder },
+        body:{ model, messages, temperature:0.2, max_tokens:2000 } };
+    }
+    return { url: a.base.replace(/\/+$/,'') + '/chat/completions',
+      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${a.key}` },
+      body:{ model:a.model, messages, temperature:0.2, max_tokens:2000 } };
+  }
+  // сетевой запрос: в приложении его делает нативная часть (без ограничений браузера)
+  const aiWaiters = {};
+  window.__aiResult = (id, ok, status, text) => { const w = aiWaiters[id]; if (w){ delete aiWaiters[id]; w({ok, status, text}); } };
+  function httpPost(req){
+    if (NATIVE){
+      const id = uid();
+      return new Promise(resolve => {
+        aiWaiters[id] = resolve;
+        post({type:'ai', id, url:req.url, headers:req.headers, body:JSON.stringify(req.body)});
+        setTimeout(()=>{ if (aiWaiters[id]){ delete aiWaiters[id]; resolve({ok:false, status:0, text:'timeout'}); } }, 75000);
+      });
+    }
+    return fetch(req.url, {method:'POST', headers:req.headers, body:JSON.stringify(req.body)})
+      .then(async r => ({ok:r.ok, status:r.status, text: await r.text()}))
+      .catch(e => ({ok:false, status:0, text:String(e)}));
+  }
+  function httpError(r){
+    if (r.status===0) return r.text==='timeout' ? 'нет ответа' : 'нет связи';
+    if (r.status===401 || r.status===403) return 'неверный ключ или нет доступа';
+    if (r.status===404) return 'не найдена модель или адрес';
+    if (r.status===429) return 'слишком много запросов';
+    if (r.status===402) return 'закончились деньги на счёте';
+    return 'ошибка ' + r.status;
+  }
+
+  function aiContext(){
+    const t = todayKey(), d = new Date();
+    const WDN = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+    const daysObj = {};
+    for (let i=-1;i<=7;i++){
+      const k = shiftKey(t,i);
+      daysObj[k] = { weekday: WDN[fromKey(k).getDay()], items: itemsOn(k).map(x => ({ id:x.id, kind: x.kind==='routine' ? 'закреплённая' : 'разовая', title:x.title, time:x.time||null, dur:x.time ? x.dur : null, part: x.time ? null : x.part, cat:x.cat, done:x.done })) };
+    }
+    const mon = mondayOf(d), wk = [...Array(7)].map((_,i)=>key(addDays(mon,i))), mk = monthKeys(ymOf(t));
+    const catObj = list => Object.fromEntries(byCat(list).map(([c,a])=>[c, Math.round(a)]));
+    const h = state.habits[t] || {};
+    return {
+      now: `${t} ${fromMin(nowMin())}, ${WDN[d.getDay()]}`,
+      settings: { wake: state.settings.wake, sleep: state.settings.sleep, water_goal_ml: waterGoal(), sleep_goal_h: state.settings.sleepGoal },
+      days: daysObj,
+      routines: state.routines.map(r => ({ id:r.id, title:r.title, time:r.time||null, dur:r.time ? r.dur : null, part:r.time ? null : r.part, days:r.days, cat:r.cat })),
+      free_today: freeWindows(t).map(([a,b]) => `${fromMin(a)}–${fromMin(b)}`),
+      health_today: { water_ml: h.ml||0, sleep: sleepMin(t) ? fmtDur(sleepMin(t)) : null, bed:h.bed||null, wake:h.wake||null,
+        food: foodOn(t).map((x,i)=>({ index:i, name:x.name, g:x.g||null, kcal:x.kcal||null, p:x.p||null, f:x.f||null, c:x.c||null })), food_totals: foodTotals(t),
+        sugar_today: state.sugar[t] || null, sugar_streak_days: sugarStreak(), sugar_best: sugarBest() },
+      reflection_recent: Object.fromEntries([0,1,2].map(i=>shiftKey(t,-i)).filter(k=>state.reflect[k]).map(k=>[k, state.reflect[k]])),
+      spend: { today_total: Math.round(total(spendIn([t]))), week_total: Math.round(total(spendIn(wk))), week_by_cat: catObj(spendIn(wk)),
+        month_total: Math.round(total(spendIn(mk))), month_by_cat: catObj(spendIn(mk)),
+        recent: state.spend.slice(-12).map(x => ({ id:x.id, date:x.date, amt:x.amt, cat:x.cat, note:x.note||null })) },
+      categories: { tasks: CATS, spend: SPEND_CATS, day_parts: PARTS },
+    };
+  }
+
+  const AI_SYSTEM = `Ты — ассистент в личном iPhone-приложении «Life of CEO» студента. Общаешься по-русски, на «ты», коротко и по делу.
+Ты управляешь всем приложением: задачами, расписанием, водой, сахаром, едой, сном, тратами и рефлексией. Данные пользователя приходят в CONTEXT.
+
+Отвечай ТОЛЬКО одним JSON-объектом без пояснений и без markdown:
+{"reply":"текст для пользователя","actions":[ ... ]}
+
+Действия (поля в скобках необязательные):
+- {"type":"add_task","title":"...","date":"YYYY-MM-DD","time":"HH:MM","dur":минуты,"repeat_days":[0-6],"part":"Утро|День|Вечер","cat":"Учёба|Спорт|Работа|Личное|Уход","remind":true}
+  • time не указывай, если у дела нет времени — тогда это задача-галочка, укажи part.
+  • repeat_days — для закреплённых (повторяющихся) дел: 0=вс, 1=пн … 6=сб. Тогда date не нужна.
+  • dur по умолчанию 60; пара в вузе 90.
+- {"type":"update_task","id":"...","title"?,"date"?,"time"?,"dur"?,"cat"?,"part"?,"remind"?,"repeat_days"?} — перенос, смена времени, длительности, названия.
+- {"type":"delete_task","id":"...","only_date":"YYYY-MM-DD"?} — only_date для закреплённой: убрать только в этот день.
+- {"type":"set_done","id":"...","date":"YYYY-MM-DD","done":true|false}
+- {"type":"add_water","ml":число,"date"?} — может быть отрицательным, чтобы убрать.
+- {"type":"set_sleep","date"?,"bed":"HH:MM","wake":"HH:MM"}
+- {"type":"add_food","name":"...","g"?,"kcal"?,"p"?,"f"?,"c"?,"date"?} — p/f/c это белки/жиры/углеводы в граммах. Если пользователь не дал цифры, оцени сам по типичным значениям.
+- {"type":"delete_food","index":число,"date"?}
+- {"type":"sugar","value":"clean|ate","date"?} — clean = день без сахара, ate = был сахар (серия обнуляется). Сладкая еда = ate.
+- {"type":"add_spend","amt":число,"cat":"Еда|Транспорт|Жильё|Учёба|Спорт|Развлечения|Покупки|Другое","note"?,"date"?}
+- {"type":"delete_spend","id":"..."}
+- {"type":"reflect","score":1-10,"text"?,"date"?}
+- {"type":"open_reflect"}
+- {"type":"update_settings","wake"?,"sleep"?,"water_l"?,"sleep_goal_h"?}
+
+Правила:
+- Даты считай от CONTEXT.now. «Завтра», «в пятницу» и т.п. переводи в YYYY-MM-DD. Время всегда HH:MM (24 часа): «в 21 00» = 21:00, «в 9 вечера» = 21:00.
+- Для изменения или удаления бери id из CONTEXT. Не выдумывай id. Если не уверен, о какой задаче речь, — спроси в reply и не делай действий.
+- На вопросы («сколько выпил», «сколько потратил за неделю», «что у меня завтра», «сколько свободного времени») отвечай по CONTEXT, actions пустой.
+- Фото расписания вуза: создай закреплённые задачи (repeat_days) для каждой пары с её временем и длительностью, cat «Учёба». Если чётные/нечётные недели — спроси.
+- Фото еды: оцени блюдо, вес, ккал и БЖУ, добавь add_food. Фото чека: add_spend с итоговой суммой.
+- Доходы не записываются — только траты.
+- reply: 1–3 коротких предложения, без markdown. Не перечисляй в reply то, что уже видно в списке изменений.`;
+
+  function parseAIJson(txt){
+    let t = String(txt||'').trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+    const a = t.indexOf('{'), b = t.lastIndexOf('}');
+    if (a < 0 || b <= a) return { reply: t || 'Готово.', actions: [] };
+    try { const o = JSON.parse(t.slice(a, b+1)); return { reply: String(o.reply || ''), actions: Array.isArray(o.actions) ? o.actions : [] }; }
+    catch(e){ return { reply: t.replace(/[{}"]/g,'').slice(0,400), actions: [] }; }
+  }
+
+  async function askAI(text, imageData){
+    const history = state.chat.slice(-9, -1).filter(m => m.text && !m.img).map(m => ({ role: m.who==='me' ? 'user' : 'assistant', content: m.text }));
+    const userContent = imageData
+      ? [ { type:'text', text: text || 'Разбери это фото и внеси в приложение то, что на нём.' }, { type:'image_url', image_url:{ url: imageData } } ]
+      : text;
+    const messages = [
+      { role:'system', content: AI_SYSTEM },
+      { role:'system', content: 'CONTEXT ' + JSON.stringify(aiContext()) },
+      ...history,
+      { role:'user', content: userContent },
+    ];
+    const r = await httpPost(aiRequest(messages));
+    if (!r.ok) return { error: httpError(r) };
+    let content = '';
+    try { const j = JSON.parse(r.text); content = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : ''; if (Array.isArray(content)) content = content.map(c => c.text || '').join(''); }
+    catch(e){ return { error: 'непонятный ответ сервиса' }; }
+    const out = parseAIJson(content);
+    const list = runActions(out.actions);
+    return { reply: out.reply || (list.length ? 'Готово.' : 'Не понял, уточни.'), list };
+  }
+
+  // выполнение действий от ИИ с проверкой каждого поля
+  const isDate = v => typeof v==='string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const isTime = v => typeof v==='string' && /^\d{1,2}:\d{2}$/.test(v) && +v.split(':')[0] < 24 && +v.split(':')[1] < 60;
+  const normTime = v => { const [h,m] = v.split(':'); return `${pad(+h)}:${m}`; };
+  const pick = (v, list, def) => list.includes(v) ? v : def;
+  const posNum = v => { const n = +v; return isFinite(n) && n > 0 ? n : ''; };
+  function findAny(id){
+    const t = state.tasks.find(x=>x.id===id); if (t) return {kind:'task', ref:t};
+    const r = state.routines.find(x=>x.id===id); if (r) return {kind:'routine', ref:r};
+    return null;
+  }
+  function runActions(actions){
+    const log = [];
+    const T = todayKey();
+    for (const a of actions.slice(0, 40)){
+      try {
+        const date = isDate(a.date) ? a.date : T;
+        switch (a.type){
+          case 'add_task': {
+            const title = cap(String(a.title||'').trim()).slice(0,80); if (!title) break;
+            const time = isTime(a.time) ? normTime(a.time) : '';
+            const dur = Math.max(5, Math.min(24*60, Math.round(+a.dur || 60)));
+            const base = { title, time, dur, part: time ? partOf(time) : pick(a.part, PARTS, 'День'), cat: pick(a.cat, CATS, guessCat(title.toLowerCase())), remind: time ? a.remind !== false : false };
+            const days = Array.isArray(a.repeat_days) ? [...new Set(a.repeat_days.map(Number).filter(n=>n>=0&&n<=6))] : [];
+            if (days.length){ state.routines.push({ id:uid(), from:T, days, ...base }); log.push({l: time || base.part, t:`${title} · закреплено`}); }
+            else { state.tasks.push({ id:uid(), date, done:false, ...base }); log.push({l: time || base.part, t:`${title} · ${dayLabel(date,false)}`}); sel = date; }
+            break;
+          }
+          case 'update_task': {
+            const f = findAny(a.id); if (!f) break;
+            const r = f.ref, before = r.title;
+            if (a.title) r.title = cap(String(a.title)).slice(0,80);
+            if (a.time === null || a.time === '') { r.time = ''; r.remind = false; }
+            else if (isTime(a.time)) { const had = !!r.time; r.time = normTime(a.time); r.part = partOf(r.time); if (!had) r.remind = true; }
+            if (+a.dur > 0) r.dur = Math.min(24*60, Math.round(+a.dur));
+            if (a.cat) r.cat = pick(a.cat, CATS, r.cat);
+            if (a.part && !r.time) r.part = pick(a.part, PARTS, r.part);
+            if (typeof a.remind === 'boolean' && r.time) r.remind = a.remind;
+            if (f.kind==='task' && isDate(a.date)) { r.date = a.date; sel = a.date; }
+            if (f.kind==='routine' && Array.isArray(a.repeat_days)) { const d = [...new Set(a.repeat_days.map(Number).filter(n=>n>=0&&n<=6))]; if (d.length) r.days = d; }
+            clearNotified(r.id);
+            log.push({l: r.time || r.part, t:`${before}${before!==r.title ? ' → '+r.title : ''} · изменено`});
+            break;
+          }
+          case 'delete_task': {
+            const f = findAny(a.id); if (!f) break;
+            if (f.kind==='routine' && isDate(a.only_date)) { state.skips[f.ref.id+'|'+a.only_date] = true; log.push({l:'—', t:`${f.ref.title} · убрано на ${dayLabel(a.only_date,false)}`}); }
+            else if (f.kind==='routine') { state.routines = state.routines.filter(x=>x.id!==f.ref.id); log.push({l:'—', t:`${f.ref.title} · удалено совсем`}); }
+            else { state.tasks = state.tasks.filter(x=>x.id!==f.ref.id); log.push({l:'—', t:`${f.ref.title} · удалено`}); }
+            break;
+          }
+          case 'set_done': {
+            const it = itemsOn(date).find(x=>x.id===a.id); if (!it) break;
+            setDone(it, date, a.done !== false); log.push({l: a.done !== false ? '✓' : '○', t: it.title});
+            break;
+          }
+          case 'add_water': { const ml = Math.round(+a.ml); if (!ml || Math.abs(ml) > 5000) break; addWater(date, ml); log.push({l:'Вода', t:`${ml>0?'+':''}${liters(ml)} → ${liters(hab(date).ml)} из ${liters(waterGoal())}`}); break; }
+          case 'set_sleep': { const h = hab(date); if (isTime(a.bed)) h.bed = normTime(a.bed); if (isTime(a.wake)) h.wake = normTime(a.wake); const m = sleepMin(date); log.push({l:'Сон', t: m ? fmtDur(m) : 'записано'}); break; }
+          case 'add_food': { const name = cap(String(a.name||'').trim()).slice(0,60); if (!name) break; addFood(date, { name, g:posNum(a.g), kcal:posNum(a.kcal), p:posNum(a.p), f:posNum(a.f), c:posNum(a.c) }); const x = foodOn(date).slice(-1)[0]; log.push({l:'Еда', t:`${name}${x.kcal ? ', '+fmtNum(x.kcal)+' ккал' : ''}${(x.p||x.f||x.c) ? `, Б ${fmtNum(+x.p||0,1)} / Ж ${fmtNum(+x.f||0,1)} / У ${fmtNum(+x.c||0,1)}` : ''}`}); break; }
+          case 'delete_food': { const fl = foodOn(date), i = Math.round(+a.index); if (!(i>=0 && i<fl.length)) break; const x = fl.splice(i,1)[0]; log.push({l:'Еда', t:`${x.name} · удалено`}); break; }
+          case 'sugar': { const v = a.value==='ate' ? 'ate' : 'clean'; const msg = markSugarSet(date, v); log.push({l:'Сахар', t: msg}); break; }
+          case 'add_spend': { const amt = posNum(a.amt); if (!amt) break; const cat = pick(a.cat, SPEND_CATS, 'Другое'); const note = String(a.note||'').trim().slice(0,60); state.spend.push({id:uid(), date, amt, cat, note}); log.push({l: rub(amt), t:`${note || cat}${note ? ' · '+cat : ''}`}); break; }
+          case 'delete_spend': { const x = state.spend.find(s=>s.id===a.id); if (!x) break; state.spend = state.spend.filter(s=>s.id!==a.id); log.push({l: rub(x.amt), t:`${x.note||x.cat} · удалено`}); break; }
+          case 'reflect': { const sc = Math.round(+a.score); if (!(sc>=1 && sc<=10)) break; state.reflect[date] = { score:sc, text:String(a.text||'').trim().slice(0,1500), at:Date.now() }; log.push({l:`${sc}/10`, t:'Рефлексия записана'}); break; }
+          case 'open_reflect': setTimeout(()=>openReflect(reflectDayKey()), 300); break;
+          case 'update_settings': {
+            if (isTime(a.wake)) state.settings.wake = normTime(a.wake);
+            if (isTime(a.sleep)) state.settings.sleep = normTime(a.sleep);
+            if (+a.water_l >= 1 && +a.water_l <= 6) state.settings.waterL = +a.water_l;
+            if (+a.sleep_goal_h >= 5 && +a.sleep_goal_h <= 12) state.settings.sleepGoal = +a.sleep_goal_h;
+            log.push({l:'⚙', t:'Настройки обновлены'}); break;
+          }
+        }
+      } catch(e){ console.warn('action failed', a, e); }
+    }
+    save();
+    return log;
+  }
+
+  // настройки ИИ
+  function renderAISettings(){
+    const a = aiCfg();
+    pills('aiProv', Object.entries(AI_PRESETS).map(([k,v])=>[k, v.label]), a.provider, 'prov');
+    $('aiYandex').classList.toggle('hide', a.provider!=='yandex');
+    $('aiCustom').classList.toggle('hide', a.provider==='yandex');
+    $('aiFolder').value = a.folder || ''; $('aiBase').value = a.base || ''; $('aiKey').value = a.key || ''; $('aiModel').value = a.model || '';
+    setAIStat(aiReady() ? 'ok' : '', aiReady() ? 'Подключено' : 'Не настроено');
+  }
+  function setAIStat(kind, text){ $('aiStat').className = 'aistat ' + kind; $('aiStat').querySelector('span').textContent = text; }
+  function readAIForm(){
+    const a = aiCfg();
+    a.folder = $('aiFolder').value.trim(); a.base = $('aiBase').value.trim(); a.key = $('aiKey').value.trim(); a.model = $('aiModel').value.trim();
+  }
+  $('aiProv').onclick = e => { const b = e.target.closest('[data-prov]'); if (!b) return; readAIForm(); const a = aiCfg(); a.provider = b.dataset.prov; if (!a.model || Object.values(AI_PRESETS).some(p=>p.model===a.model)) a.model = AI_PRESETS[a.provider].model; renderAISettings(); };
+  $('aiSave').onclick = () => { readAIForm(); save(); renderAISettings(); renderNet(); notify(aiReady() ? 'ИИ сохранён. Ассистент в ИИ-режиме.' : 'Заполни все поля, чтобы включить ИИ.'); };
+  $('aiCheck').onclick = async () => {
+    readAIForm(); save(); renderNet();
+    if (!aiReady()){ setAIStat('bad', 'Заполни все поля'); return; }
+    setAIStat('', 'Проверяю…');
+    const r = await httpPost(aiRequest([{ role:'system', content:'Ответь строго JSON: {"reply":"ok","actions":[]}' }, { role:'user', content:'проверка' }]));
+    if (r.ok) setAIStat('ok', 'Работает'); else setAIStat('bad', 'Не работает: ' + httpError(r));
+  };
+
   // ---------- онлайн / офлайн ----------
   const isOnline = () => navigator.onLine !== false;
   function renderNet(){
     const on = isOnline();
     $('netChip').classList.toggle('off', !on);
-    const ai = !!(state.settings && state.settings.aiReady);
+    const ai = aiReady();
     $('netChip').innerHTML = !on ? '<i></i><span><b>Офлайн-режим</b> · понимаю основные команды</span>'
       : ai ? '<i></i><span><b>ИИ-режим</b> · понимаю любые фразы</span>'
-      : '<i></i><span><b>Базовый режим</b> · ИИ подключим следующим шагом</span>';
+      : '<i></i><span><b>Базовый режим</b> · подключи ИИ в настройках</span>';
   }
-  window.addEventListener('online', () => { renderNet(); notify('Интернет появился. Ассистент снова в ИИ-режиме.'); });
+  window.addEventListener('online', () => { renderNet(); if (aiReady()) notify('Интернет появился. Ассистент снова в ИИ-режиме.'); });
   window.addEventListener('offline', () => { renderNet(); notify('Нет интернета. Ассистент перешёл в офлайн-режим, всё остальное работает как обычно.'); });
   renderNet();
 
@@ -1892,12 +2186,11 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     if (!file) return;
     const img = new Image(), url = URL.createObjectURL(file);
     img.onload = () => {
-      const scale = Math.min(1, 520/Math.max(img.width, img.height));
-      const c = document.createElement('canvas'); c.width = img.width*scale; c.height = img.height*scale;
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
-      pushChat({who:'me', img:c.toDataURL('image/jpeg',.7)}, {who:'bot', text: isOnline()
-        ? 'Фото получил. Читать фото будет ИИ в приложении на iPhone: он сам закрепит пары по дням недели. А пока скинь это фото Claude в чат, и он внесёт расписание сюда.'
-        : 'Сейчас нет интернета, а фото разбирает ИИ. Отправь фото ещё раз, когда появится сеть.'});
+      const shot = (max, q) => { const sc = Math.min(1, max/Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc); c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c.toDataURL('image/jpeg', q); };
+      const image = { thumb: shot(480, .6), full: shot(1400, .82) };
+      URL.revokeObjectURL(url);
+      const caption = $('input').value.trim(); $('input').value = ''; autosize();
+      send(caption, image);
     };
     img.onerror = () => notify('Не получилось открыть фото.');
     img.src = url;
@@ -1946,7 +2239,8 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 
   // ---------- резервная копия ----------
   $('backupBtn').onclick = () => {
-    const json = JSON.stringify({app:'life-of-ceo', version:1, savedAt:new Date().toISOString(), state});
+    const copy = JSON.parse(JSON.stringify(state)); if (copy.settings && copy.settings.ai) copy.settings.ai.key = '';
+    const json = JSON.stringify({app:'life-of-ceo', version:1, savedAt:new Date().toISOString(), state: copy});
     if (NATIVE) post({type:'backup', data: json, name:`life-of-ceo-${todayKey()}.json`});
     else { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download = `life-of-ceo-${todayKey()}.json`; a.click(); }
   };
@@ -1958,7 +2252,9 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     try {
       const obj = JSON.parse(txt), st = obj && obj.state ? obj.state : obj;
       if (!st || !st.settings || !Array.isArray(st.tasks)) throw new Error('bad');
-      state = st; state.reflect ||= {}; save(); closeSheet(); sel = todayKey(); renderAll();
+      const keep = state.settings && state.settings.ai; state = st; state.reflect ||= {};
+      if (keep && (!state.settings.ai || !state.settings.ai.key)) state.settings.ai = keep;
+      save(); closeSheet(); sel = todayKey(); renderAll();
       notify('Данные восстановлены из копии.');
     } catch(e){ notify('Это не файл резервной копии Life of CEO.'); }
   };
