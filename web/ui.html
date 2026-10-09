@@ -1,0 +1,2020 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Life of CEO</title>
+<style>/*@@FONTS@@*/</style>
+<style>
+:root{
+  --sat:env(safe-area-inset-top,0px);
+  --sab:env(safe-area-inset-bottom,0px);
+  --kb:0px;
+  --bg:#000000;
+  --raise:#141414;
+  --raise2:#1f1f1f;
+  --line:#262626;
+  --text:#f4f4f4;
+  --muted:#8c8c8c;
+  --faint:#4a4a4a;
+  --accent:#3d63ff;
+  --accent-soft:rgba(61,99,255,.16);
+  --plus:#38d27a;
+  --danger:#ff4d4d;
+  --display:'Unbounded',system-ui,sans-serif;
+  --body:'Manrope',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#000;color:var(--text);font-family:var(--body);font-size:16px;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.num{font-variant-numeric:tabular-nums}
+.hide{display:none!important}
+
+.stage{min-height:100%;display:flex;align-items:center;justify-content:center}
+.phone{position:relative;width:100%;height:100vh;height:100dvh;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+@media (min-width:520px){
+  body{background:#0a0a0a}
+  .stage{padding:32px 16px}
+  .phone{width:393px;height:852px;border-radius:54px;box-shadow:0 0 0 10px #1a1a1a,0 0 0 11px #2c2c2c,0 40px 80px rgba(0,0,0,.6)}
+  .statusbar{display:flex!important}
+  .phone{--sat:0px;--sab:24px}
+}
+.statusbar{display:none;height:50px;flex:none;align-items:flex-end;justify-content:space-between;padding:0 30px 8px 36px;font-weight:700;font-size:15px}
+.statusbar .notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:34px;border-radius:20px;background:#000;box-shadow:0 0 0 1px #111}
+.statusbar .icons{display:flex;gap:6px;align-items:center}
+
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:calc(10px + var(--sat)) 20px calc(120px + var(--sab));scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.view{display:none}
+.view.on{display:block}
+
+.top{display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em;line-height:1}
+.topbtns{display:flex;gap:8px}
+.iconbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--raise)}
+.iconbtn svg{width:20px;height:20px}
+.level{display:flex;gap:14px;margin-top:6px;color:var(--muted);font-size:13px;font-weight:600}
+.level b{color:var(--text);font-weight:700}
+
+.dateline{display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 14px}
+.datebtn{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.03em;line-height:1.05;text-align:left;display:flex;align-items:center;gap:8px}
+.datebtn svg{width:16px;height:16px;color:var(--muted);transition:transform .2s}
+.datebtn.open svg{transform:rotate(180deg)}
+.todaychip{font-size:13px;font-weight:700;color:var(--accent);padding:6px 0}
+.week{display:grid;grid-template-columns:28px repeat(7,1fr) 28px;align-items:center;gap:2px}
+.week .arrow{height:56px;color:var(--faint);display:grid;place-items:center}
+.week .arrow svg{width:16px;height:16px}
+.day{height:60px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--muted);font-weight:600;position:relative}
+.day .n{font-size:17px;color:var(--text);font-weight:700}
+.day.today .n{color:var(--accent)}
+.day.sel{background:var(--text);color:#000}
+.day.sel .n{color:#000}
+.day .dot{width:4px;height:4px;border-radius:50%;background:var(--faint);position:absolute;bottom:7px}
+.day.sel .dot{background:#000}
+.day .dot.full{background:var(--accent)}
+
+.month{display:none;margin:4px 0 8px;padding:14px;border-radius:22px;background:var(--raise)}
+.month.on{display:block}
+.month .mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:700}
+.month .mhead button{width:32px;height:32px;display:grid;place-items:center;color:var(--muted)}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.mgrid .wd{font-size:11px;color:var(--faint);font-weight:700;padding-bottom:4px}
+.mgrid button{height:38px;border-radius:12px;font-size:14px;font-weight:600;position:relative}
+.mgrid button.other{color:var(--faint)}
+.mgrid button.today{color:var(--accent)}
+.mgrid button.sel{background:var(--text);color:#000}
+.mgrid button.has::after{content:"";position:absolute;bottom:5px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--muted)}
+.mgrid button.sel.has::after{background:#000}
+
+.laps{margin:22px 0 4px}
+.laps .row{display:flex;gap:3px;height:10px}
+.laps .seg{flex:1;border-radius:3px;background:var(--raise2);transition:background .35s}
+.laps .seg.done{background:var(--accent)}
+.laps .cap{display:flex;justify-content:space-between;margin-top:10px;font-size:14px;color:var(--muted);font-weight:600}
+.laps .cap b{color:var(--text);font-weight:700}
+
+.free{margin-top:16px;padding:14px 16px;border-radius:20px;background:var(--raise);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.free .fv{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em}
+.free .fl{font-size:13px;color:var(--muted);font-weight:600;margin-top:3px}
+.free .fn{font-size:13px;color:var(--muted);text-align:right;line-height:1.35}
+.free .fn b{color:var(--text);display:block;font-size:14px}
+
+.sect{display:flex;justify-content:space-between;align-items:baseline;margin:28px 0 8px}
+.sect h3{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.02em}
+.sect span{font-size:13px;color:var(--muted);font-weight:600}
+
+.item{display:grid;grid-template-columns:52px 34px 1fr;align-items:start;min-height:64px;position:relative}
+.item .t{font-size:14px;font-weight:700;padding-top:13px;font-variant-numeric:tabular-nums}
+.item .rail{position:relative;height:100%;display:flex;justify-content:center}
+.item .rail::before{content:"";position:absolute;top:0;bottom:0;width:2px;background:var(--line)}
+.tl > :first-child .rail::before{top:20px}
+.tl > :last-child .rail::before{bottom:calc(100% - 20px)}
+.tl > :only-child .rail::before{display:none}
+.check{position:relative;z-index:1;margin-top:9px;width:26px;height:26px;border-radius:50%;border:2px solid var(--faint);background:var(--bg);display:grid;place-items:center;transition:all .2s;flex:none}
+.check svg{width:14px;height:14px;opacity:0;transform:scale(.4);transition:all .2s;color:#fff}
+.done .check{background:var(--accent);border-color:var(--accent)}
+.done .check svg{opacity:1;transform:scale(1)}
+.item .body{padding:10px 0 12px 6px;text-align:left;width:100%}
+.title{font-size:17px;font-weight:600;line-height:1.3;transition:color .2s}
+.done .title{color:var(--faint);text-decoration:line-through;text-decoration-thickness:1.5px}
+.meta{font-size:13px;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.meta .ic{display:inline-flex;align-items:center;gap:3px}
+.meta svg{width:12px;height:12px}
+.pop .check{animation:pop .35s}
+@keyframes pop{40%{transform:scale(1.25)}}
+.gap,.nowline{display:grid;grid-template-columns:52px 34px 1fr;align-items:center;min-height:30px}
+.gap .rail{height:100%;display:flex;justify-content:center;position:relative;min-height:30px}
+.gap .rail::before{content:"";position:absolute;top:0;bottom:0;width:2px;background:repeating-linear-gradient(to bottom,var(--line) 0 4px,transparent 4px 8px)}
+.gap .gl{font-size:13px;color:var(--muted);font-weight:600;padding-left:6px}
+.nowline{color:var(--accent);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;min-height:22px}
+.nowline .dotc{display:flex;justify-content:center}
+.nowline .dotc i{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.nowline .ln{height:2px;background:var(--accent);opacity:.5;border-radius:2px}
+
+.group .gt{font-size:13px;color:var(--muted);font-weight:700;margin:14px 0 2px}
+.crow{display:flex;align-items:center;gap:12px;min-height:50px;border-bottom:1px solid var(--line)}
+.crow:last-child{border-bottom:0}
+.crow .check{margin-top:0;width:24px;height:24px}
+.crow .body{flex:1;text-align:left;padding:12px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.crow .title{font-size:16px}
+.pin{width:14px;height:14px;color:var(--faint);flex:none}
+.empty{padding:28px 0;text-align:center;color:var(--muted);line-height:1.5;font-size:15px}
+.empty b{display:block;color:var(--text);font-size:16px;margin-bottom:4px}
+
+.fab{position:absolute;right:20px;bottom:calc(74px + var(--sab));width:58px;height:58px;border-radius:50%;background:var(--text);color:#000;display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,.6);z-index:5;transition:transform .15s}
+.fab:active{transform:scale(.92)}
+.fab svg{width:24px;height:24px}
+
+.tabbar{position:absolute;left:0;right:0;bottom:0;padding:10px 8px calc(4px + var(--sab));background:linear-gradient(to top,#000 70%,rgba(0,0,0,0));display:flex;justify-content:space-around;z-index:4}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--faint);padding:6px 6px;min-width:62px}
+.tab svg{width:23px;height:23px}
+.tab.on{color:var(--text)}
+
+.h1{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.03em;margin:24px 0 6px}
+.sub{color:var(--muted);font-size:15px;line-height:1.45;max-width:34ch}
+.card{background:var(--raise);border-radius:22px;padding:16px;margin-top:10px}
+.card .ch{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:10px}
+.card .ch b{font-weight:700;font-size:16px}
+.card .ch span{color:var(--muted);font-size:13px;font-weight:600;text-align:right}
+.daynav{display:flex;align-items:center;justify-content:space-between;margin:20px 0 6px;gap:10px}
+.daynav b{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em}
+.daynav .arrs{display:flex;gap:6px;flex:none}
+.daynav .arrs button{width:36px;height:36px;border-radius:50%;background:var(--raise);display:grid;place-items:center}
+.daynav .arrs svg{width:16px;height:16px}
+.bigv{font-family:var(--display);font-weight:700;font-size:34px;letter-spacing:-.03em;line-height:1.1}
+.bigv small{font-family:var(--body);font-size:15px;color:var(--muted);font-weight:600;letter-spacing:0}
+
+.water{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stepper{display:flex;gap:8px;flex:none}
+.water .bigv{white-space:nowrap}
+.water .bigv small{display:block;font-size:14px;margin-top:4px}
+.stepper button{width:46px;height:46px;border-radius:50%;background:var(--raise2);display:grid;place-items:center;font-size:22px;font-weight:600}
+.stepper button.plus{background:var(--text);color:#000}
+.stepper button.half{width:auto;padding:0 14px;white-space:nowrap;border-radius:23px;font-size:14px;font-weight:700}
+.glasses{display:flex;gap:4px;height:8px;margin-top:14px}
+.glasses i{flex:1;border-radius:3px;background:var(--raise2)}
+.glasses i.on{background:var(--accent)}
+.glasses i.over{background:var(--plus)}
+
+.sbtns{display:flex;gap:8px;margin-top:14px}
+.sbtn{flex:1;height:46px;border-radius:14px;background:var(--raise2);font-weight:700;font-size:14px;color:var(--muted)}
+.sbtn.clean.on{background:var(--plus);color:#000}
+.sbtn.ate.on{background:var(--danger);color:#fff}
+.sdots{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:14px;text-align:center}
+.sdots i{display:block;height:8px;border-radius:3px;background:var(--raise2)}
+.sdots i.clean{background:var(--plus)}
+.sdots i.ate{background:var(--danger)}
+.sdots span{font-size:10.5px;color:var(--faint);font-weight:700;display:block;margin-top:6px}
+.sdots .cur span{color:var(--text)}
+
+.sleeprow{display:flex;gap:10px}
+.sleeprow label{flex:1;font-size:13px;color:var(--muted);font-weight:600;display:flex;flex-direction:column;gap:6px}
+.inp{background:var(--raise2);border:1px solid transparent;border-radius:14px;padding:12px 13px;font-size:16px;color-scheme:dark;outline:none;width:100%;min-width:0}
+.inp:focus{border-color:var(--faint)}
+.sleepv{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px}
+.sleepv b{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:-.03em}
+.sleepv span{color:var(--muted);font-size:13px;font-weight:600}
+.mini{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:64px;align-items:end;margin-top:14px}
+.mini .c{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.mini .b{width:100%;max-width:22px;border-radius:6px;background:var(--raise2);position:relative;overflow:hidden;height:100%}
+.mini .b i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:6px}
+.mini .d{font-size:10.5px;color:var(--faint);font-weight:700}
+.mini .c.cur .d{color:var(--text)}
+
+.macros{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.macro{background:var(--raise2);border-radius:14px;padding:11px 6px;text-align:center}
+.macro b{display:block;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.macro span{font-size:11.5px;color:var(--muted);font-weight:600}
+.addbtn{width:100%;height:46px;border-radius:14px;background:var(--raise2);font-weight:700;font-size:15px;margin-top:12px}
+
+.entry{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.entry:last-child{border-bottom:0}
+.entry .en{font-weight:600;font-size:15px}
+.entry .es{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+.entry .ev{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.entry .x{width:28px;height:28px;border-radius:50%;color:var(--faint);display:grid;place-items:center;flex:none}
+.entry .x svg{width:14px;height:14px}
+.entry .rt{display:flex;align-items:center;gap:6px}
+
+.seg2{display:flex;background:var(--raise);border-radius:14px;padding:3px;gap:3px;margin-top:14px}
+.seg2 button{flex:1;height:38px;border-radius:11px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg2 button.on{background:var(--text);color:#000}
+.catrow{padding:11px 0;border-bottom:1px solid var(--line)}
+.catrow:last-child{border-bottom:0}
+.catrow .tp{display:flex;justify-content:space-between;font-weight:600;font-size:15px;gap:10px}
+.catrow .tp span{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.catrow .tp span b{color:var(--text);font-weight:700}
+.catrow .bar{height:6px;border-radius:3px;background:var(--raise2);margin-top:8px;overflow:hidden}
+.catrow .bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+
+.chat{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.msg{max-width:86%;padding:12px 15px;border-radius:20px;line-height:1.42;font-size:15px;white-space:pre-line}
+.msg.me{align-self:flex-end;background:var(--accent);border-bottom-right-radius:6px}
+.msg.me.photo{padding:8px;background:var(--raise2)}
+.msg.me.photo img{display:block;width:100%;border-radius:12px}
+.msg.bot{align-self:flex-start;background:var(--raise);border-bottom-left-radius:6px}
+.msg.bot .added{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.msg.bot .added div{display:flex;gap:10px;font-size:14px}
+.msg.bot .added span{color:var(--muted);font-variant-numeric:tabular-nums;min-width:44px;white-space:nowrap}
+.hints{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.rate{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
+.rate button{height:44px;border-radius:12px;background:var(--raise2);font-weight:700;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rate button.on{background:var(--accent);color:#fff}
+.rate-cap{display:flex;justify-content:space-between;font-size:12px;color:var(--faint);font-weight:600;margin-top:6px}
+textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
+.refl{background:var(--raise);border-radius:22px;padding:16px;margin-top:4px;text-align:left;width:100%;display:block}
+.refl .rt{display:flex;align-items:baseline;gap:10px}
+.refl .score{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:-.03em}
+.refl .score small{font-family:var(--body);font-size:15px;color:var(--muted);font-weight:600;letter-spacing:0}
+.refl p{margin-top:8px;font-size:15px;line-height:1.5;color:#ddd;white-space:pre-line}
+.refl .ask{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:15px;font-weight:600}
+.refl .ask b{padding:9px 14px;border-radius:12px;background:var(--text);color:#000;font-size:14px;flex:none}
+.rlist .ri{padding:12px 0;border-bottom:1px solid var(--line)}
+.rlist .ri:last-child{border-bottom:0}
+.rlist .rh{display:flex;justify-content:space-between;font-weight:700;font-size:15px}
+.rlist .rh span{color:var(--accent);font-variant-numeric:tabular-nums}
+.rlist p{font-size:14px;color:var(--muted);line-height:1.45;margin-top:4px;white-space:pre-line}
+.netchip{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:8px 12px;border-radius:12px;background:var(--raise);font-size:13px;font-weight:600;color:var(--muted)}
+.netchip i{width:8px;height:8px;border-radius:50%;background:var(--plus);flex:none}
+.netchip.off i{background:#f5a524}
+.netchip b{color:var(--text);font-weight:700}
+.hint{font-size:13px;font-weight:600;padding:9px 13px;border-radius:14px;border:1px solid var(--line);color:var(--muted);text-align:left}
+.composer{position:absolute;left:12px;right:12px;bottom:calc(66px + var(--sab));display:none;gap:8px;align-items:flex-end;z-index:5}
+.composer.on{display:flex}
+.composer textarea{flex:1;resize:none;max-height:110px;min-height:48px;padding:13px 16px;border-radius:24px;background:var(--raise);border:1px solid var(--line);outline:none;font-size:16px;line-height:1.35;min-width:0}
+.composer textarea:focus{border-color:var(--faint)}
+.round{width:48px;height:48px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--raise);border:1px solid var(--line)}
+.round svg{width:22px;height:22px}
+.round.send{background:var(--text);color:#000;border:0}
+.round.rec{background:var(--danger);border-color:var(--danger);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(255,77,77,.2)}}
+
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:22px}
+.stat{background:var(--raise);border-radius:22px;padding:16px}
+.stat .v{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:-.03em;white-space:nowrap}
+.stat .l{color:var(--muted);font-size:13px;font-weight:600;margin-top:4px}
+.bars .cols{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:110px;align-items:end}
+.bars .col{display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end}
+.bars .b{width:100%;max-width:26px;border-radius:7px;background:var(--raise2);position:relative;overflow:hidden;height:100%}
+.bars .b i{position:absolute;left:0;right:0;bottom:0;background:var(--accent);border-radius:7px;transition:height .5s}
+.bars .col.today .d{color:var(--text)}
+.bars .d{font-size:11px;color:var(--faint);font-weight:700}
+.kv{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-weight:600;gap:10px}
+.kv:last-child{border:0}
+.kv span{color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .25s;z-index:10}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:90%;overflow-y:auto;background:var(--raise);border-radius:28px 28px 0 0;padding:10px 20px calc(20px + var(--sab));transform:translateY(105%);transition:transform .3s cubic-bezier(.2,.8,.2,1);z-index:11;scrollbar-width:none}
+.sheet::-webkit-scrollbar{display:none}
+.sheet.on{transform:none}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--faint);margin:0 auto 16px}
+.sheet h2{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.02em;margin-bottom:16px}
+.field{width:100%;background:var(--raise2);border:1px solid transparent;border-radius:16px;padding:15px 16px;font-size:17px;outline:none}
+.field:focus{border-color:var(--faint)}
+.lbl{font-size:13px;color:var(--muted);font-weight:600;margin:16px 0 8px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{padding:9px 14px;border-radius:14px;background:var(--raise2);font-size:14px;font-weight:600;color:var(--muted)}
+.pill.on{background:var(--text);color:#000}
+.pills.days .pill{padding:9px 0;flex:1;text-align:center}
+.timerow{display:flex;gap:10px;align-items:center}
+.timerow input{flex:1;background:var(--raise2);border:0;border-radius:16px;padding:13px 14px;font-size:16px;color-scheme:dark;min-width:0}
+.suf{display:grid;gap:8px}
+.suf.two{grid-template-columns:1fr 1fr}
+.suf.three{grid-template-columns:1fr 1fr 1fr}
+.suf label{position:relative;display:block}
+.suf input{width:100%;background:var(--raise2);border:1px solid transparent;border-radius:14px;padding:13px 44px 13px 14px;font-size:16px;outline:none;font-variant-numeric:tabular-nums;min-width:0;-moz-appearance:textfield}
+.suf input::-webkit-outer-spin-button,.suf input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.suf input:focus{border-color:var(--faint)}
+.suf label span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;font-weight:600;pointer-events:none}
+.swrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;font-size:15px;font-weight:600}
+.swrow small{display:block;color:var(--muted);font-size:13px;font-weight:500;margin-top:2px}
+.sw{width:50px;height:30px;border-radius:15px;background:var(--raise2);position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+.sw[aria-checked="true"]{background:var(--accent)}
+.sw[aria-checked="true"]::after{transform:translateX(20px);background:#fff}
+.sheetbtns{display:flex;gap:10px;margin-top:24px}
+.btn{flex:1;height:54px;border-radius:18px;font-weight:700;font-size:16px;background:var(--text);color:#000}
+.btn.ghost{background:var(--raise2);color:var(--danger);flex:0 0 auto;padding:0 20px}
+.btn.sec{background:var(--raise2);color:var(--text)}
+.note{font-size:13px;color:var(--muted);line-height:1.45;margin-top:10px}
+.gc{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;background:var(--raise2)}
+.gc .gi{width:36px;height:36px;border-radius:10px;background:#fff;color:#000;display:grid;place-items:center;font-weight:800;font-size:18px;flex:none}
+.gc .gt2{flex:1}
+.gc .gt2 b{display:block;font-size:15px}
+.gc .gt2 span{font-size:13px;color:var(--muted)}
+.gc button{padding:9px 14px;border-radius:12px;background:var(--text);color:#000;font-weight:700;font-size:14px}
+
+.toast{position:absolute;left:10px;right:10px;top:calc(8px + var(--sat));visibility:hidden;z-index:20;background:rgba(40,40,40,.94);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:22px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;transform:translateY(-140%);transition:transform .45s cubic-bezier(.2,.9,.25,1.1),visibility 0s .45s}
+.toast.on{transform:none;visibility:visible;transition:transform .45s cubic-bezier(.2,.9,.25,1.1)}
+@media (min-width:520px){.toast{top:54px}}
+.toast .ic{width:38px;height:38px;border-radius:10px;background:#000;border:1px solid #333;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:15px;flex:none}
+.toast .tx{flex:1;min-width:0}
+.toast .tt{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.toast .tt span{color:var(--muted);font-weight:500;font-size:13px}
+.toast .tb{font-size:14px;line-height:1.35;margin-top:2px;color:#ddd}
+
+.phone::before{content:'';position:absolute;left:0;right:0;top:0;height:calc(var(--sat) + 6px);background:linear-gradient(#000 75%,rgba(0,0,0,0));z-index:3;pointer-events:none}
+.kb .tabbar,.kb .fab{visibility:hidden}
+.kb .composer{bottom:calc(var(--kb) + 8px)}
+.kb .sheet.on{bottom:var(--kb);max-height:calc(100% - var(--kb) - var(--sat) - 8px);padding-bottom:16px}
+.backup{display:flex;gap:10px;margin-top:8px}
+.backup .btn{height:48px;font-size:15px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="phone" id="phone">
+  <div class="statusbar"><span id="sbtime">9:41</span><div class="notch"></div>
+    <div class="icons">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+      <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="22" height="11" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><rect x="24" y="4" width="1.5" height="4" rx=".75" fill="currentColor" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="ic">L</div>
+    <div class="tx"><div class="tt">Life of CEO <span>сейчас</span></div><div class="tb" id="toastBody"></div></div>
+  </div>
+
+  <main class="screen" id="screen">
+    <section class="view on" id="v-day">
+      <div class="top">
+        <div>
+          <div class="brand">Life of CEO</div>
+          <div class="level" id="level"></div>
+        </div>
+        <div class="topbtns">
+          <button class="iconbtn" id="bell" aria-label="Что дальше по плану">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          </button>
+          <button class="iconbtn" id="gear" aria-label="Настройки">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="dateline">
+        <button class="datebtn" id="dateBtn" aria-expanded="false"><span id="dateTitle"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <button class="todaychip" id="todayBtn">Сегодня</button>
+      </div>
+      <div class="month" id="month">
+        <div class="mhead">
+          <button id="mPrev" aria-label="Предыдущий месяц"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+          <span id="mTitle"></span>
+          <button id="mNext" aria-label="Следующий месяц"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <div class="mgrid" id="mgrid"></div>
+      </div>
+      <div class="week" id="week"></div>
+
+      <div class="laps" id="laps"></div>
+      <div id="freeCard"></div>
+
+      <div class="sect"><h3>Расписание</h3><span id="schedCount"></span></div>
+      <div class="tl" id="timeline"></div>
+
+      <div class="sect"><h3>Задачи</h3><span id="checkCount"></span></div>
+      <div id="checklist"></div>
+
+      <div id="reflectWrap">
+        <div class="sect"><h3>Рефлексия</h3><span id="reflectTime"></span></div>
+        <div id="reflectCard"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-ai">
+      <div class="brand">Life of CEO</div>
+      <h1 class="h1">Ассистент</h1>
+      <p class="sub">Управляй всем приложением словами: добавляй, переноси и удаляй дела, записывай воду, еду и траты, спрашивай итоги.</p>
+      <div class="netchip" id="netChip" role="status"></div>
+      <div class="hints" id="hints">
+        <button class="hint">Что ты умеешь?</button>
+        <button class="hint">По понедельникам и средам в 18 теннис на 2 часа</button>
+        <button class="hint">Перенеси теннис на 19:30</button>
+        <button class="hint">Выпил 500 мл воды</button>
+        <button class="hint">Съел курицу с рисом 350 г 520 ккал бжу 40/12/60</button>
+        <button class="hint">Потратил 450 на обед</button>
+        <button class="hint">Сегодня без сахара</button>
+        <button class="hint">Сколько я потратил за неделю?</button>
+      </div>
+      <div class="chat" id="chat"></div>
+    </section>
+
+    <section class="view" id="v-health">
+      <div class="brand">Life of CEO</div>
+      <div class="daynav"><b id="hDate"></b><div class="arrs">
+        <button data-hshift="-1" aria-label="Предыдущий день"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button data-hshift="1" aria-label="Следующий день"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div></div>
+
+      <div class="card">
+        <div class="ch"><b>Вода</b><span id="wGoal"></span></div>
+        <div class="water">
+          <div class="bigv num" id="wVal"></div>
+          <div class="stepper">
+            <button id="wMinus" aria-label="Убрать 250 мл">−</button>
+            <button class="half" id="wHalf">+0,5 л</button>
+            <button class="plus" id="wPlus" aria-label="Добавить 250 мл">+</button>
+          </div>
+        </div>
+        <div class="glasses" id="wGlasses"></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><b>Без сахара</b><span id="sugBest"></span></div>
+        <div class="bigv num" id="sugVal"></div>
+        <div class="sbtns">
+          <button class="sbtn clean" id="sugClean">Без сахара</button>
+          <button class="sbtn ate" id="sugAte">Съел сахар</button>
+        </div>
+        <div class="sdots" id="sugWeek"></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><b>Питание</b><span id="fCount"></span></div>
+        <div class="macros" id="macros"></div>
+        <div id="foodList"></div>
+        <button class="addbtn" id="foodAddBtn">Записать еду</button>
+      </div>
+
+      <div class="card">
+        <div class="ch"><b>Сон</b><span>прошлая ночь</span></div>
+        <div class="sleeprow">
+          <label>Лёг<input type="time" class="inp" id="sBed"></label>
+          <label>Встал<input type="time" class="inp" id="sWake"></label>
+        </div>
+        <div class="sleepv"><b class="num" id="sHours">—</b><span id="sNote"></span></div>
+        <div class="mini" id="sWeek"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-money">
+      <div class="brand">Life of CEO</div>
+      <div class="seg2" id="mPeriod"><button data-p="day">День</button><button data-p="week">Неделя</button><button data-p="month" class="on">Месяц</button></div>
+      <div class="daynav"><b id="mTitleP"></b><div class="arrs">
+        <button data-mshift="-1" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button data-mshift="1" aria-label="Вперёд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div></div>
+      <div class="card">
+        <div class="ch"><b>Общие траты</b><span id="mAvg"></span></div>
+        <div class="bigv num" id="mTotal"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><b>По категориям</b></div>
+        <div id="mCats"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><b>Записи</b><span id="mCount"></span></div>
+        <div id="moneyList"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-stats">
+      <div class="brand">Life of CEO</div>
+      <h1 class="h1">Итоги недели</h1>
+      <div class="statgrid" id="statgrid"></div>
+      <div class="card bars" id="bars"></div>
+      <div class="card" id="cats"></div>
+      <div class="card" id="refWeek"></div>
+    </section>
+  </main>
+
+  <button class="fab" id="fab" aria-label="Добавить">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+  </button>
+
+  <div class="composer" id="composer">
+    <button class="round" id="photoBtn" aria-label="Отправить фото">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
+    </button>
+    <input type="file" id="photoInput" accept="image/*" class="hide">
+    <textarea id="input" rows="1" placeholder="Напиши или скажи"></textarea>
+    <button class="round" id="mic" aria-label="Сказать голосом">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></svg>
+    </button>
+    <button class="round send" id="send" aria-label="Отправить">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
+  </div>
+
+  <nav class="tabbar">
+    <button class="tab on" data-view="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>День</button>
+    <button class="tab" data-view="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></svg>Ассистент</button>
+    <button class="tab" data-view="health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s6.5 7.2 6.5 12a6.5 6.5 0 0 1-13 0c0-4.8 6.5-12 6.5-12z"/></svg>Здоровье</button>
+    <button class="tab" data-view="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/></svg>Траты</button>
+    <button class="tab" data-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Итоги</button>
+  </nav>
+
+  <div class="scrim" id="scrim"></div>
+
+  <div class="sheet" id="taskSheet" role="dialog" aria-modal="true" aria-labelledby="tsTitle">
+    <div class="grab"></div>
+    <h2 id="tsTitle">Новая задача</h2>
+    <input class="field" id="fTitle" placeholder="Что сделать" maxlength="80">
+    <div class="lbl">Время</div>
+    <div class="pills" id="fMode"></div>
+    <div id="timedBox">
+      <div class="timerow" style="margin-top:10px"><input type="time" id="fTime" aria-label="Время начала"></div>
+      <div class="lbl">Длительность</div>
+      <div class="pills" id="fDur"></div>
+      <div class="suf two" style="margin-top:8px">
+        <label><input type="number" min="0" max="23" id="fDurH" inputmode="numeric" aria-label="Часы"><span>ч</span></label>
+        <label><input type="number" min="0" max="59" step="5" id="fDurM" inputmode="numeric" aria-label="Минуты"><span>мин</span></label>
+      </div>
+      <div class="swrow"><div>Напоминания<small>за 60, 30 и 15 минут до начала</small></div><button class="sw" id="fRemind" role="switch" aria-checked="true" aria-label="Напоминания"></button></div>
+    </div>
+    <div id="partBox">
+      <div class="lbl">Когда в течение дня</div>
+      <div class="pills" id="fPart"></div>
+    </div>
+    <div class="lbl">Повтор</div>
+    <div class="pills" id="fRep"></div>
+    <div class="pills days hide" id="fDays" style="margin-top:8px"></div>
+    <div id="dateBox"><div class="lbl">Дата</div><div class="timerow"><input type="date" id="fDate" aria-label="Дата"></div></div>
+    <div class="lbl">Сфера</div>
+    <div class="pills" id="fCat"></div>
+    <div class="sheetbtns">
+      <button class="btn ghost" id="fDel">Удалить</button>
+      <button class="btn" id="fSave">Добавить</button>
+    </div>
+  </div>
+
+  <div class="sheet" id="foodSheet" role="dialog" aria-modal="true" aria-labelledby="fsTitle">
+    <div class="grab"></div>
+    <h2 id="fsTitle">Что съел</h2>
+    <input class="field" id="foodName" placeholder="Название" maxlength="60">
+    <div class="lbl">Вес и калории</div>
+    <div class="suf two">
+      <label><input type="number" min="0" id="foodG" inputmode="decimal" aria-label="Граммы"><span>г</span></label>
+      <label><input type="number" min="0" id="foodK" inputmode="decimal" aria-label="Калории"><span>ккал</span></label>
+    </div>
+    <div class="lbl">Белки, жиры, углеводы, граммы</div>
+    <div class="suf three">
+      <label><input type="number" min="0" id="foodP" inputmode="decimal" aria-label="Белки, граммы"><span>Б</span></label>
+      <label><input type="number" min="0" id="foodF" inputmode="decimal" aria-label="Жиры, граммы"><span>Ж</span></label>
+      <label><input type="number" min="0" id="foodC" inputmode="decimal" aria-label="Углеводы, граммы"><span>У</span></label>
+    </div>
+    <p class="note">Заполняй то, что знаешь. Пустые поля не считаются.</p>
+    <div class="sheetbtns"><button class="btn" id="foodSave">Записать</button></div>
+  </div>
+
+  <div class="sheet" id="refSheet" role="dialog" aria-modal="true" aria-labelledby="rsTitle">
+    <div class="grab"></div>
+    <h2 id="rsTitle">Как прошёл день?</h2>
+    <p class="note" id="refDate" style="margin:-8px 0 4px"></p>
+    <div class="lbl">Оценка дня</div>
+    <div class="rate" id="refRate"></div>
+    <div class="rate-cap"><span>плохо</span><span>отлично</span></div>
+    <div class="lbl">Саморефлексия</div>
+    <textarea class="field" id="refText" maxlength="1500" placeholder="Что получилось, что нет, что завтра сделать лучше"></textarea>
+    <div class="sheetbtns"><button class="btn" id="refSave">Сохранить</button></div>
+  </div>
+
+  <div class="sheet" id="moneySheet" role="dialog" aria-modal="true" aria-labelledby="msTitle">
+    <div class="grab"></div>
+    <h2 id="msTitle">Новая трата</h2>
+    <div class="suf"><label><input id="mAmt" type="number" min="0" inputmode="decimal" placeholder="Сумма" aria-label="Сумма"><span>₽</span></label></div>
+    <div class="lbl">Категория</div>
+    <div class="pills" id="mCatPills"></div>
+    <div class="lbl">Дата</div>
+    <div class="timerow"><input type="date" id="mDate" aria-label="Дата"></div>
+    <input class="field" id="mNote" placeholder="Комментарий, если нужен" style="margin-top:14px;font-size:16px" maxlength="60">
+    <div class="sheetbtns"><button class="btn" id="mSave">Записать</button></div>
+  </div>
+
+  <div class="sheet" id="setSheet" role="dialog" aria-modal="true" aria-labelledby="ssTitle">
+    <div class="grab"></div>
+    <h2 id="ssTitle">Настройки</h2>
+    <div class="gc">
+      <div class="gi">G</div>
+      <div class="gt2"><b>Google Календарь</b><span>Не подключён</span></div>
+      <button id="gcBtn">Подключить</button>
+    </div>
+    <div class="lbl">Режим дня, чтобы считать свободное время</div>
+    <div class="sleeprow">
+      <label>Подъём<input type="time" class="inp" id="setWake"></label>
+      <label>Отбой<input type="time" class="inp" id="setSleep"></label>
+    </div>
+    <div class="lbl">Норма воды в день</div>
+    <div class="pills" id="setWater"></div>
+    <div class="lbl">Цель по сну</div>
+    <div class="pills" id="setSleepGoal"></div>
+    <div class="lbl">Резервная копия</div>
+    <div class="backup"><button class="btn sec" id="backupBtn">Сохранить копию</button><button class="btn sec" id="restoreBtn">Восстановить</button></div>
+    <p class="note">Копия — это файл со всеми твоими данными. Сохрани его в «Файлы» или отправь себе в Telegram.</p>
+    <div class="sheetbtns"><button class="btn sec" id="resetBtn" style="color:var(--danger)">Стереть все данные</button></div>
+  </div>
+</div>
+</div>
+
+<script>
+(() => {
+  const CATS = ['Учёба','Спорт','Работа','Личное','Уход'];
+  const PARTS = ['Утро','День','Вечер'];
+  const DURS = [15,30,45,60,90,120,180];
+  const REPS = [['once','Один раз'],['daily','Каждый день'],['weekdays','По будням'],['custom','Свои дни']];
+  const SPEND_CATS = ['Еда','Транспорт','Жильё','Учёба','Спорт','Развлечения','Покупки','Другое'];
+  const REMIND_OFFS = [60,30,15];
+  const SUGAR_NUDGE = 21*60;
+  const WD = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const WD_JS = [1,2,3,4,5,6,0];
+  const MONTHS = ['январь','февраль','март','апрель','май','июнь','июль','август','сентябрь','октябрь','ноябрь','декабрь'];
+  const MONTHS_G = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  const MONTH_STEMS = ['январ','феврал','март','апрел','ма','июн','июл','август','сентябр','октябр','ноябр','декабр'];
+  const $ = id => document.getElementById(id);
+  const ICON_PIN = '<svg class="pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17v5M9 10.8V4h6v6.8l3 3.2H6z"/></svg>';
+  const ICON_BELL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>';
+  const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+
+  // ---------- утилиты ----------
+  const pad = n => String(n).padStart(2,'0');
+  const key = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const fromKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d); };
+  const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+  const shiftKey = (k,n) => key(addDays(fromKey(k),n));
+  const mondayOf = d => addDays(d, -((d.getDay()+6)%7));
+  const todayKey = () => key(new Date());
+  const nowMin = () => { const n = new Date(); return n.getHours()*60+n.getMinutes(); };
+  const toMin = t => { const [h,m] = t.split(':').map(Number); return h*60+m; };
+  const fromMin = m => `${pad(Math.floor(((m%1440)+1440)%1440/60))}:${pad(((m%60)+60)%60)}`;
+  const fmtDur = m => { m = Math.round(m); const h = Math.floor(m/60), mi = m%60; return h ? (mi ? `${h} ч ${mi} мин` : `${h} ч`) : `${mi} мин`; };
+  const durPill = m => m < 60 ? `${m} мин` : String(m/60).replace('.',',') + ' ч';
+  const fmtNum = (n, d=0) => (+n).toLocaleString('ru-RU', {maximumFractionDigits:d});
+  const rub = n => fmtNum(Math.round(n)) + ' ₽';
+  const liters = ml => fmtNum(ml/1000, 2) + ' л';
+  const plural = (n, a, b, c) => { n = Math.abs(n); const m10 = n%10, m100 = n%100; return (m10===1 && m100!==11) ? a : (m10>=2 && m10<=4 && (m100<10 || m100>=20)) ? b : c; };
+  const days = n => `${n} ${plural(n,'день','дня','дней')}`;
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uid = () => Math.random().toString(36).slice(2,10);
+  const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+  const ymOf = k => k.slice(0,7);
+  const ymTitle = ym => { const [y,m] = ym.split('-').map(Number); return `${MONTHS[m-1]} ${y}`; };
+  const prevYm = ym => { const [y,m] = ym.split('-').map(Number); const d = new Date(y, m-2, 1); return `${d.getFullYear()}-${pad(d.getMonth()+1)}`; };
+  const monthKeys = ym => { const [y,m] = ym.split('-').map(Number); const n = new Date(y,m,0).getDate(); return [...Array(n)].map((_,i)=>`${ym}-${pad(i+1)}`); };
+  function dayLabel(k, capital=true){
+    const t = todayKey(); let s;
+    if (k===t) s='сегодня'; else if (k===shiftKey(t,1)) s='завтра'; else if (k===shiftKey(t,-1)) s='вчера';
+    else { const d = fromKey(k); s = `${d.getDate()} ${MONTHS_G[d.getMonth()]}`; }
+    return capital ? cap(s) : s;
+  }
+
+  // ---------- данные ----------
+  const STORE = 'life-of-ceo-v3';
+  const NATIVE = !!window.ReactNativeWebView;
+  const post = m => { try { if (NATIVE) window.ReactNativeWebView.postMessage(JSON.stringify(m)); } catch(e){} };
+  let saveTimer = null;
+  function save(){
+    try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e){}
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{ post({type:'save', data: JSON.stringify(state)}); scheduleSync(); }, 300);
+  }
+  function load(){
+    if (window.__INITIAL_STATE__ && typeof window.__INITIAL_STATE__ === 'object') return window.__INITIAL_STATE__;
+    try { const r = localStorage.getItem(STORE); return r ? JSON.parse(r) : null; } catch(e){ return null; }
+  }
+  const haptic = kind => { if (NATIVE) post({type:'haptic', kind}); else if (navigator.vibrate) navigator.vibrate(kind==='success' ? [20,40,20] : 15); };
+  function fresh(){
+    const t = todayKey(), all = [0,1,2,3,4,5,6];
+    const r = (title, part) => ({ id:uid(), title, time:'', dur:15, part, cat:'Уход', remind:false, days:all, from:t });
+    return {
+      createdAt: t,
+      settings:{ wake:'08:00', sleep:'23:30', waterL:2.5, sleepGoal:8 },
+      routines:[ r('Умыться и почистить зубы','Утро'), r('Утренние процедуры: душ, уход','Утро'), r('Заправить кровать','Утро'), r('Почистить зубы','Вечер'), r('Вечерние процедуры','Вечер') ],
+      rdone:{}, skips:{}, reflect:{}, tasks:[], habits:{}, food:{}, sugar:{}, spend:[], reports:{}, notified:{}, chat:[]
+    };
+  }
+  let state = load();
+  if (!state){ state = fresh(); save(); }
+  state.reflect ||= {};
+
+  let sel = todayKey(), monthCursor = fromKey(sel), monthOpen = false, view = 'day';
+
+  // ---------- задачи ----------
+  function itemsOn(k){
+    const wd = fromKey(k).getDay(), out = [];
+    for (const t of state.tasks) if (t.date===k) out.push({kind:'task', ref:t, id:t.id, title:t.title, time:t.time, dur:t.dur||60, part:t.part||'День', cat:t.cat, remind:t.remind!==false, done:!!t.done, pinned:false});
+    for (const r of state.routines) if (r.from<=k && r.days.includes(wd) && !state.skips[r.id+'|'+k]) out.push({kind:'routine', ref:r, id:r.id, title:r.title, time:r.time, dur:r.dur||60, part:r.part||'День', cat:r.cat, remind:r.remind!==false, done:!!state.rdone[r.id+'|'+k], pinned:true});
+    return out;
+  }
+  const timed = k => itemsOn(k).filter(i=>i.time).sort((a,b)=>toMin(a.time)-toMin(b.time));
+  const untimed = k => itemsOn(k).filter(i=>!i.time);
+  function setDone(item, k, val){
+    if (item.kind==='routine'){ const kk = item.id+'|'+k; if (val) state.rdone[kk] = true; else delete state.rdone[kk]; }
+    else item.ref.done = val;
+    item.done = val; save();
+  }
+  const findItem = (id, k) => itemsOn(k).find(i=>i.id===id);
+  const partOf = time => toMin(time)<720 ? 'Утро' : toMin(time)<1080 ? 'День' : 'Вечер';
+  function clearNotified(id){ for (const k of Object.keys(state.notified)) if (k.startsWith(id+'|')) delete state.notified[k]; }
+
+  function freeWindows(k){
+    let ws = toMin(state.settings.wake), we = toMin(state.settings.sleep);
+    if (we <= ws) we += 1440;
+    let cur = k===todayKey() ? Math.max(ws, nowMin()) : ws;
+    const busy = timed(k).map(i => [toMin(i.time), toMin(i.time)+i.dur]);
+    const gaps = [];
+    for (const [s,e] of busy){ if (s > cur) gaps.push([cur, Math.min(s, we)]); cur = Math.max(cur, e); if (cur >= we) break; }
+    if (cur < we) gaps.push([cur, we]);
+    return gaps.filter(([s,e]) => e-s >= 15);
+  }
+  const freeTotal = k => freeWindows(k).reduce((a,[s,e])=>a+e-s, 0);
+
+  const doneCountOn = k => itemsOn(k).filter(i=>i.done).length;
+  function streak(){
+    let n = 0, d = todayKey();
+    if (!doneCountOn(d)) d = shiftKey(d,-1);
+    while (d >= state.createdAt && doneCountOn(d)){ n++; d = shiftKey(d,-1); }
+    return n;
+  }
+  const xp = () => (state.tasks.filter(t=>t.done).length + Object.keys(state.rdone).length) * 10;
+
+  // ---------- здоровье ----------
+  const hab = k => (state.habits[k] ||= {ml:0, bed:'', wake:''});
+  const waterGoal = () => Math.round(state.settings.waterL*1000);
+  function addWater(k, ml){ const h = hab(k); h.ml = Math.max(0, h.ml + ml); save(); return h.ml; }
+  function sleepMin(k){
+    const h = state.habits[k]; if (!h || !h.bed || !h.wake) return null;
+    let m = toMin(h.wake) - toMin(h.bed); if (m <= 0) m += 1440; return m;
+  }
+  function sugarStreak(){
+    const t = todayKey();
+    if (state.sugar[t]==='ate') return 0;
+    let d = state.sugar[t]==='clean' ? t : shiftKey(t,-1), n = 0;
+    while (state.sugar[d]==='clean'){ n++; d = shiftKey(d,-1); }
+    return n;
+  }
+  function sugarBest(){
+    const ks = Object.keys(state.sugar).filter(k=>state.sugar[k]==='clean').sort();
+    let best = 0, run = 0, prev = null;
+    for (const k of ks){ run = (prev && shiftKey(prev,1)===k) ? run+1 : 1; best = Math.max(best, run); prev = k; }
+    return best;
+  }
+  function markSugar(k, val){
+    const before = sugarStreak();
+    if (state.sugar[k]===val) delete state.sugar[k]; else state.sugar[k] = val;
+    save();
+    const n = sugarStreak();
+    if (state.sugar[k]==='clean') return n===1 ? 'Первый день без сахара. Так держать.' : `Ты уже ${days(n)} без сахара.`;
+    if (state.sugar[k]==='ate') return before > 0 ? `Серия обнулилась, было ${days(before)} без сахара. Начнём заново.` : 'Записал: сегодня был сахар.';
+    return 'Снял отметку.';
+  }
+  const foodOn = k => state.food[k] || [];
+  function foodTotals(k){
+    const t = {kcal:0,p:0,f:0,c:0};
+    for (const x of foodOn(k)){ t.kcal += +x.kcal||0; t.p += +x.p||0; t.f += +x.f||0; t.c += +x.c||0; }
+    return t;
+  }
+  function addFood(k, o){ (state.food[k] ||= []).push({id:uid(), name:o.name, g:o.g||'', kcal:o.kcal||'', p:o.p||'', f:o.f||'', c:o.c||''}); save(); }
+  const foodMeta = x => [x.g?`${fmtNum(x.g)} г`:'', x.kcal?`${fmtNum(x.kcal)} ккал`:'', (x.p||x.f||x.c)?`Б ${fmtNum(+x.p||0,1)} · Ж ${fmtNum(+x.f||0,1)} · У ${fmtNum(+x.c||0,1)}`:''].filter(Boolean).join(' · ') || 'без деталей';
+
+  // ---------- траты ----------
+  const spendIn = ks => { const set = new Set(ks); return state.spend.filter(x=>set.has(x.date)); };
+  const total = list => list.reduce((a,x)=>a+x.amt,0);
+  function byCat(list){
+    const m = {};
+    for (const x of list) m[x.cat] = (m[x.cat]||0) + x.amt;
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+  }
+  function monthReport(ym){
+    const ks = monthKeys(ym), list = spendIn(ks), sum = total(list);
+    const name = ymTitle(ym);
+    if (!list.length) return { text:`Отчёт за ${name}: трат не записано.` };
+    const cats = byCat(list);
+    const perDay = {}; for (const x of list) perDay[x.date] = (perDay[x.date]||0) + x.amt;
+    const top = Object.entries(perDay).sort((a,b)=>b[1]-a[1])[0];
+    const prev = total(spendIn(monthKeys(prevYm(ym))));
+    let txt = `Отчёт по тратам за ${name}.\nВсего ${rub(sum)}, в среднем ${rub(sum/ks.length)} в день.\nСамый дорогой день: ${dayLabel(top[0],false)}, ${rub(top[1])}.`;
+    if (prev){ const diff = Math.round((sum-prev)/prev*100); txt += `\nК прошлому месяцу: ${diff>0?'+':''}${diff}%.`; }
+    txt += '\nПо категориям:';
+    return { text: txt, list: cats.map(([c,a]) => ({l: Math.round(a/sum*100)+'%', t:`${c}: ${rub(a)}`})) };
+  }
+
+  // ---------- экран «День» ----------
+  function renderHeader(){
+    const x = xp();
+    $('level').innerHTML = `<span>Уровень <b>${Math.floor(x/100)+1}</b></span><span>Серия <b>${days(streak())}</b></span><span><b>${x}</b> XP</span>`;
+    $('dateTitle').textContent = dayLabel(sel);
+    $('todayBtn').style.visibility = sel === todayKey() ? 'hidden' : 'visible';
+    $('dateBtn').classList.toggle('open', monthOpen);
+    $('dateBtn').setAttribute('aria-expanded', monthOpen);
+  }
+  function renderWeek(){
+    const mon = mondayOf(fromKey(sel)), t = todayKey();
+    let html = `<button class="arrow" data-shift="-7" aria-label="Прошлая неделя"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>`;
+    for (let i=0;i<7;i++){
+      const d = addDays(mon,i), k = key(d), its = itemsOn(k);
+      const dot = its.length ? `<i class="dot ${its.every(x=>x.done)?'full':''}"></i>` : '';
+      html += `<button class="day ${k===t?'today':''} ${k===sel?'sel':''}" data-key="${k}"><span>${WD[i]}</span><span class="n">${d.getDate()}</span>${dot}</button>`;
+    }
+    html += `<button class="arrow" data-shift="7" aria-label="Следующая неделя"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>`;
+    $('week').innerHTML = html;
+  }
+  function renderMonth(){
+    $('month').classList.toggle('on', monthOpen);
+    if (!monthOpen) return;
+    const y = monthCursor.getFullYear(), m = monthCursor.getMonth(), t = todayKey();
+    $('mTitle').textContent = cap(`${MONTHS[m]} ${y}`);
+    const start = mondayOf(new Date(y,m,1));
+    let html = WD.map(w => `<span class="wd">${w}</span>`).join('');
+    for (let i=0;i<42;i++){
+      const d = addDays(start,i), k = key(d);
+      if (i>=35 && d.getMonth()!==m) break;
+      const has = state.tasks.some(x=>x.date===k);
+      html += `<button class="${d.getMonth()!==m?'other':''} ${k===t?'today':''} ${k===sel?'sel':''} ${has?'has':''}" data-key="${k}">${d.getDate()}</button>`;
+    }
+    $('mgrid').innerHTML = html;
+  }
+  function metaFor(i){
+    const p = [];
+    if (i.time) p.push(`<span class="num">до ${fromMin(toMin(i.time)+i.dur)}</span>`);
+    p.push(`<span>${i.cat}</span>`);
+    if (i.time && i.remind) p.push(`<span class="ic" title="Напоминания за 60, 30 и 15 минут">${ICON_BELL}</span>`);
+    if (i.pinned) p.push(`<span class="ic" title="Закреплено">${ICON_PIN.replace('class="pin"','')}</span>`);
+    return p.join('');
+  }
+  function renderDay(){
+    const all = itemsOn(sel), done = all.filter(i=>i.done).length;
+    $('laps').innerHTML = all.length ? `<div class="row">${all.map(i=>`<i class="seg ${i.done?'done':''}"></i>`).join('')}</div><div class="cap"><span><b>${done}</b> из ${all.length} сделано</span><span>${all.length-done ? 'Осталось '+(all.length-done) : 'День закрыт'}</span></div>` : '';
+
+    const isToday = sel===todayKey(), now = nowMin();
+    if (sel >= todayKey()){
+      const wins = freeWindows(sel), tot = wins.reduce((a,[s,e])=>a+e-s,0);
+      const curWin = isToday ? wins.find(([s,e]) => s<=now && now<e) : null;
+      const nextWin = wins.find(([s,e]) => e-s >= 30 && (!isToday || s>now)) || wins[0];
+      let right = '';
+      if (curWin) right = `<b>Сейчас свободно</b>до ${fromMin(curWin[1])}`;
+      else if (nextWin) right = `<b>${fromMin(nextWin[0])}–${fromMin(nextWin[1])}</b>ближайшее окно`;
+      $('freeCard').innerHTML = `<div class="free"><div><div class="fv num">${tot ? fmtDur(tot) : 'Нет'}</div><div class="fl">${isToday ? 'свободно до отбоя' : 'свободного времени'}</div></div><div class="fn">${right}</div></div>`;
+    } else $('freeCard').innerHTML = '';
+
+    const tl = timed(sel);
+    $('schedCount').textContent = tl.length ? `${tl.filter(i=>i.done).length} из ${tl.length}` : '';
+    if (!tl.length) $('timeline').innerHTML = `<div class="empty"><b>Ничего по времени</b>Нажми плюс или скажи ассистенту.</div>`;
+    else {
+      let html = '', nowPlaced = !isToday, prevEnd = null;
+      const nowRow = () => `<div class="nowline"><span>${fromMin(now)}</span><span class="dotc"><i></i></span><span class="ln"></span></div>`;
+      tl.forEach(i => {
+        const s = toMin(i.time);
+        if (!nowPlaced && s > now && prevEnd !== null && now < prevEnd){ html += nowRow(); nowPlaced = true; }
+        if (prevEnd !== null && s - prevEnd >= 30) html += `<div class="gap"><span></span><span class="rail"></span><span class="gl">Свободно ${fmtDur(s-prevEnd)}</span></div>`;
+        if (!nowPlaced && s > now){ html += nowRow(); nowPlaced = true; }
+        html += `<div class="item ${i.done?'done':''}" data-id="${i.id}">
+          <span class="t">${i.time}</span>
+          <span class="rail"><button class="check" data-check="${i.id}" aria-label="${i.done?'Отменить':'Отметить'}: ${esc(i.title)}">${ICON_CHECK}</button></span>
+          <button class="body" data-edit="${i.id}"><div class="title">${esc(i.title)}</div><div class="meta">${metaFor(i)}</div></button></div>`;
+        prevEnd = Math.max(prevEnd ?? 0, s + i.dur);
+      });
+      if (!nowPlaced) html += nowRow();
+      $('timeline').innerHTML = html;
+    }
+
+    const un = untimed(sel);
+    $('checkCount').textContent = un.length ? `${un.filter(i=>i.done).length} из ${un.length}` : '';
+    $('checklist').innerHTML = !un.length ? `<div class="empty"><b>Пусто</b>Сюда попадают дела без времени.</div>` :
+      PARTS.map(p => {
+        const g = un.filter(i=>i.part===p).sort((a,b)=>b.pinned-a.pinned);
+        if (!g.length) return '';
+        return `<div class="group"><div class="gt">${p}</div>${g.map(i => `
+          <div class="crow ${i.done?'done':''}" data-id="${i.id}">
+            <button class="check" data-check="${i.id}" aria-label="${i.done?'Отменить':'Отметить'}: ${esc(i.title)}">${ICON_CHECK}</button>
+            <button class="body" data-edit="${i.id}"><span class="title">${esc(i.title)}</span>${i.pinned?ICON_PIN:''}</button>
+          </div>`).join('')}</div>`;
+      }).join('');
+    renderReflectCard();
+  }
+  function renderReflectCard(){
+    const r = state.reflect[sel];
+    $('reflectWrap').classList.toggle('hide', sel > todayKey());
+    $('reflectTime').textContent = sel===todayKey() && !r ? `откроется в ${fromMin(toMin(state.settings.sleep)-5)}` : '';
+    $('reflectCard').innerHTML = r
+      ? `<button class="refl" id="reflOpen"><div class="rt"><span class="score num">${r.score}<small> / 10</small></span></div>${r.text ? `<p>${esc(r.text)}</p>` : ''}</button>`
+      : `<button class="refl" id="reflOpen"><div class="ask"><span>${sel===todayKey() ? 'Оцени день и запиши мысли' : 'Рефлексия не заполнена'}</span><b>Заполнить</b></div></button>`;
+    $('reflOpen').onclick = () => openReflect(sel);
+  }
+  function renderAll(){
+    renderHeader(); renderWeek(); renderMonth(); renderDay();
+    if (view==='stats') renderStats();
+    if (view==='health') renderHealth();
+    if (view==='money') renderMoney();
+  }
+
+  $('week').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.shift){ sel = shiftKey(sel, +b.dataset.shift); monthCursor = fromKey(sel); }
+    else if (b.dataset.key) sel = b.dataset.key;
+    renderAll();
+  });
+  $('dateBtn').onclick = () => { monthOpen = !monthOpen; monthCursor = fromKey(sel); renderAll(); };
+  $('todayBtn').onclick = () => { sel = todayKey(); monthCursor = fromKey(sel); renderAll(); };
+  $('mPrev').onclick = () => { monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth()-1, 1); renderMonth(); };
+  $('mNext').onclick = () => { monthCursor = new Date(monthCursor.getFullYear(), monthCursor.getMonth()+1, 1); renderMonth(); };
+  $('mgrid').addEventListener('click', e => { const b = e.target.closest('button[data-key]'); if (b){ sel = b.dataset.key; monthOpen = false; renderAll(); } });
+  function onListClick(e){
+    const c = e.target.closest('[data-check]');
+    if (c){
+      const it = findItem(c.dataset.check, sel); if (!it) return;
+      setDone(it, sel, !it.done); renderAll();
+      if (it.done){
+        const el = document.querySelector(`[data-id="${it.id}"]`); el && el.classList.add('pop');
+        haptic('light');
+        if (itemsOn(sel).every(i=>i.done)) setTimeout(()=>allDoneCheck(sel, true), 300);
+      }
+      return;
+    }
+    const ed = e.target.closest('[data-edit]');
+    if (ed){ const it = findItem(ed.dataset.edit, sel); if (it) openTask(it); }
+  }
+  $('timeline').addEventListener('click', onListClick);
+  $('checklist').addEventListener('click', onListClick);
+
+  // ---------- шторки ----------
+  let openSheetEl = null;
+  function openSheet(el){ openSheetEl = el; $('scrim').classList.add('on'); el.classList.add('on'); }
+  function closeSheet(){ if (openSheetEl) openSheetEl.classList.remove('on'); $('scrim').classList.remove('on'); openSheetEl = null; }
+  $('scrim').onclick = closeSheet;
+  document.addEventListener('keydown', e => { if (e.key==='Escape' && openSheetEl) closeSheet(); });
+  function pills(id, list, cur, attr){ $(id).innerHTML = list.map(([v,l]) => `<button class="pill ${v===cur?'on':''}" data-${attr}="${v}">${l}</button>`).join(''); }
+
+  let ed = null, f = {};
+  function renderDurPills(){ pills('fDur', DURS.map(d=>[d,durPill(d)]), f.dur, 'dur'); }
+  function syncDurInputs(){ $('fDurH').value = Math.floor(f.dur/60); $('fDurM').value = f.dur%60; }
+  function renderTaskForm(){
+    pills('fMode', [['none','Без времени'],['timed','Ко времени']], f.timed?'timed':'none', 'mode');
+    $('timedBox').classList.toggle('hide', !f.timed);
+    $('partBox').classList.toggle('hide', f.timed);
+    renderDurPills();
+    $('fRemind').setAttribute('aria-checked', f.remind);
+    pills('fPart', PARTS.map(p=>[p,p]), f.part, 'part');
+    pills('fRep', REPS, f.rep, 'rep');
+    $('fDays').classList.toggle('hide', f.rep!=='custom');
+    $('fDays').innerHTML = WD.map((w,i)=>`<button class="pill ${f.days.includes(WD_JS[i])?'on':''}" data-day="${WD_JS[i]}">${w}</button>`).join('');
+    $('dateBox').classList.toggle('hide', f.rep!=='once');
+    pills('fCat', CATS.map(c=>[c,c]), f.cat, 'cat');
+  }
+  ['fMode','fDur','fPart','fRep','fDays','fCat'].forEach(id => $(id).addEventListener('click', e => {
+    const b = e.target.closest('.pill'); if (!b) return;
+    const d = b.dataset;
+    if (d.mode){ f.timed = d.mode==='timed'; if (f.timed && !$('fTime').value) $('fTime').value = '10:00'; }
+    if (d.dur){ f.dur = +d.dur; syncDurInputs(); }
+    if (d.part) f.part = d.part;
+    if (d.rep){ f.rep = d.rep; if (d.rep==='daily') f.days=[0,1,2,3,4,5,6]; if (d.rep==='weekdays') f.days=[1,2,3,4,5]; if (d.rep==='custom' && f.days.length===7) f.days=[fromKey(sel).getDay()]; }
+    if (d.day !== undefined){ const n = +d.day; f.days = f.days.includes(n) ? f.days.filter(x=>x!==n) : [...f.days, n]; }
+    if (d.cat) f.cat = d.cat;
+    renderTaskForm();
+  }));
+  const onDurInput = () => {
+    const h = Math.max(0, parseInt($('fDurH').value)||0), m = Math.max(0, parseInt($('fDurM').value)||0);
+    f.dur = h*60 + m; renderDurPills();
+  };
+  $('fDurH').addEventListener('input', onDurInput);
+  $('fDurM').addEventListener('input', onDurInput);
+  $('fRemind').onclick = () => { f.remind = !f.remind; $('fRemind').setAttribute('aria-checked', f.remind); };
+  const repOf = d => { const s = [...d].sort().join(); return s==='0,1,2,3,4,5,6' ? 'daily' : s==='1,2,3,4,5' ? 'weekdays' : 'custom'; };
+  function openTask(item){
+    ed = item || null;
+    const r = item ? item.ref : null;
+    f = {
+      timed: item ? !!item.time : false,
+      dur: item ? item.dur : 60,
+      part: item ? item.part : (nowMin() < 720 ? 'Утро' : nowMin() < 1080 ? 'День' : 'Вечер'),
+      rep: item && item.kind==='routine' ? repOf(r.days) : 'once',
+      days: item && item.kind==='routine' ? [...r.days] : [0,1,2,3,4,5,6],
+      cat: item ? item.cat : 'Личное',
+      remind: item && item.time ? item.remind : true,
+    };
+    $('tsTitle').textContent = item ? (item.pinned ? 'Закреплённая задача' : 'Задача') : 'Новая задача';
+    $('fSave').textContent = item ? 'Сохранить' : 'Добавить';
+    $('fDel').classList.toggle('hide', !item);
+    $('fTitle').value = item ? item.title : '';
+    $('fTime').value = item && item.time ? item.time : '';
+    $('fDate').value = item && item.kind==='task' ? r.date : sel;
+    syncDurInputs(); renderTaskForm();
+    openSheet($('taskSheet'));
+    if (!item) setTimeout(()=>$('fTitle').focus(), 280);
+  }
+  $('fSave').onclick = () => {
+    const title = $('fTitle').value.trim();
+    if (!title){ $('fTitle').focus(); $('fTitle').placeholder = 'Напиши, что сделать'; return; }
+    if (f.rep!=='once' && !f.days.length){ notify('Выбери хотя бы один день повтора.'); return; }
+    if (f.timed && f.dur <= 0){ notify('Укажи длительность больше нуля.'); return; }
+    const time = f.timed ? ($('fTime').value || '10:00') : '';
+    const data = { title, time, dur: f.timed ? f.dur : (ed ? ed.dur : 60), part: time ? partOf(time) : f.part, cat:f.cat, remind: time ? f.remind : false };
+    if (ed) clearNotified(ed.id);
+    if (f.rep==='once'){
+      const date = $('fDate').value || sel;
+      if (ed && ed.kind==='task') Object.assign(ed.ref, data, {date});
+      else {
+        if (ed) state.routines = state.routines.filter(x=>x.id!==ed.id);
+        state.tasks.push({ id:uid(), done:false, date, ...data });
+      }
+      sel = date;
+    } else {
+      if (ed && ed.kind==='routine') Object.assign(ed.ref, data, {days:[...f.days]});
+      else {
+        if (ed) state.tasks = state.tasks.filter(x=>x.id!==ed.id);
+        state.routines.push({ id:uid(), from:sel, days:[...f.days], ...data });
+      }
+    }
+    save(); closeSheet(); renderAll();
+  };
+  $('fDel').onclick = () => {
+    if (!ed) return;
+    if (ed.kind==='routine') state.routines = state.routines.filter(x=>x.id!==ed.id);
+    else state.tasks = state.tasks.filter(x=>x.id!==ed.id);
+    save(); closeSheet(); renderAll();
+  };
+  $('fTitle').addEventListener('keydown', e => { if (e.key==='Enter') $('fSave').click(); });
+
+  // ---------- настройки ----------
+  function renderSettings(){
+    $('setWake').value = state.settings.wake;
+    $('setSleep').value = state.settings.sleep;
+    pills('setWater', [2,2.5,3,3.5].map(n=>[n, fmtNum(n,1)+' л']), state.settings.waterL, 'w');
+    pills('setSleepGoal', [7,7.5,8,9].map(n=>[n, fmtNum(n,1)+' ч']), state.settings.sleepGoal, 'sg');
+  }
+  $('gear').onclick = () => { renderSettings(); openSheet($('setSheet')); };
+  $('gcBtn').onclick = () => notify('Google Календарь подключим следующим шагом, вместе с ИИ.');
+  $('setWake').onchange = e => { state.settings.wake = e.target.value || '08:00'; save(); renderAll(); };
+  $('setSleep').onchange = e => { state.settings.sleep = e.target.value || '23:30'; save(); renderAll(); };
+  $('setWater').onclick = e => { const b = e.target.closest('[data-w]'); if (b){ state.settings.waterL = +b.dataset.w; save(); renderSettings(); } };
+  $('setSleepGoal').onclick = e => { const b = e.target.closest('[data-sg]'); if (b){ state.settings.sleepGoal = +b.dataset.sg; save(); renderSettings(); } };
+  let resetArmed = false;
+  $('resetBtn').onclick = () => {
+    if (!resetArmed){ resetArmed = true; $('resetBtn').textContent = 'Нажми ещё раз, чтобы стереть'; setTimeout(()=>{ resetArmed=false; $('resetBtn').textContent='Стереть все данные'; }, 3000); return; }
+    state = fresh(); sel = todayKey(); save(); closeSheet(); renderAll(); notify('Все данные стёрты.');
+  };
+
+  // ---------- экран «Здоровье» ----------
+  let hSel = todayKey();
+  function renderHealth(){
+    $('hDate').textContent = dayLabel(hSel);
+    const h = hab(hSel), goal = waterGoal();
+    $('wGoal').textContent = h.ml >= goal ? 'норма выполнена' : `осталось ${liters(goal-h.ml)}`;
+    $('wVal').innerHTML = `${liters(h.ml)} <small>из ${liters(goal)}</small>`;
+    const segs = Math.round(goal/250), filled = Math.round(h.ml/250);
+    $('wGlasses').innerHTML = [...Array(Math.max(segs, filled))].map((_,i)=>`<i class="${i<filled ? (i>=segs?'over':'on') : ''}"></i>`).join('');
+
+    const st = sugarStreak(), mark = state.sugar[hSel], best = sugarBest();
+    $('sugVal').innerHTML = st ? `${st} <small>${plural(st,'день','дня','дней')} подряд</small>` : `0 <small>дней, начни сегодня</small>`;
+    $('sugBest').textContent = best ? `рекорд ${days(best)}` : '';
+    $('sugClean').classList.toggle('on', mark==='clean');
+    $('sugAte').classList.toggle('on', mark==='ate');
+    $('sugClean').textContent = mark==='clean' ? 'Без сахара ✓' : 'Без сахара';
+    const mon = mondayOf(fromKey(hSel));
+    $('sugWeek').innerHTML = [...Array(7)].map((_,i)=>{ const k = key(addDays(mon,i)); return `<div class="${k===hSel?'cur':''}"><i class="${state.sugar[k]||''}"></i><span>${WD[i]}</span></div>`; }).join('');
+
+    const ft = foodTotals(hSel), fl = foodOn(hSel);
+    $('fCount').textContent = fl.length ? `${fl.length} ${plural(fl.length,'запись','записи','записей')}` : '';
+    $('macros').innerHTML = [[fmtNum(ft.kcal),'ккал'],[fmtNum(ft.p,1),'белки, г'],[fmtNum(ft.f,1),'жиры, г'],[fmtNum(ft.c,1),'углев., г']].map(([v,l])=>`<div class="macro"><b>${v}</b><span>${l}</span></div>`).join('');
+    $('foodList').innerHTML = fl.map(x=>`<div class="entry"><div><div class="en">${esc(x.name)}</div><div class="es num">${foodMeta(x)}</div></div><button class="x" data-fdel="${x.id}" aria-label="Удалить">${ICON_X}</button></div>`).join('');
+
+    $('sBed').value = h.bed || ''; $('sWake').value = h.wake || '';
+    const sm = sleepMin(hSel), g = state.settings.sleepGoal*60;
+    $('sHours').textContent = sm ? fmtDur(sm) : '—';
+    $('sNote').textContent = sm ? (sm >= g ? 'норма выполнена' : `до цели ${fmtDur(g-sm)}`) : 'внеси время';
+    $('sWeek').innerHTML = [...Array(7)].map((_,i)=>{ const k = key(addDays(mon,i)), m = sleepMin(k)||0; return `<div class="c ${k===hSel?'cur':''}"><div class="b"><i style="height:${Math.min(100,m/600*100)}%"></i></div><span class="d">${WD[i]}</span></div>`; }).join('');
+  }
+  document.querySelector('#v-health .arrs').onclick = e => { const b = e.target.closest('[data-hshift]'); if (b){ hSel = shiftKey(hSel, +b.dataset.hshift); renderHealth(); } };
+  function waterTap(ml){
+    const before = hab(hSel).ml, after = addWater(hSel, ml); renderHealth();
+    if (before < waterGoal() && after >= waterGoal()) notify(`Норма воды ${liters(waterGoal())} выполнена.`);
+  }
+  $('wPlus').onclick = () => waterTap(250);
+  $('wHalf').onclick = () => waterTap(500);
+  $('wMinus').onclick = () => waterTap(-250);
+  $('sugClean').onclick = () => { const m = markSugar(hSel,'clean'); renderHealth(); if (state.sugar[hSel]) notify(m); };
+  $('sugAte').onclick = () => { const m = markSugar(hSel,'ate'); renderHealth(); if (state.sugar[hSel]) notify(m); };
+  $('sBed').onchange = e => { hab(hSel).bed = e.target.value; save(); renderHealth(); };
+  $('sWake').onchange = e => { hab(hSel).wake = e.target.value; save(); renderHealth(); };
+  $('foodAddBtn').onclick = () => { ['foodName','foodG','foodK','foodP','foodF','foodC'].forEach(id=>$(id).value=''); openSheet($('foodSheet')); setTimeout(()=>$('foodName').focus(),280); };
+  $('foodSave').onclick = () => {
+    const name = $('foodName').value.trim(); if (!name){ $('foodName').focus(); return; }
+    const n = id => { const v = parseFloat($(id).value); return v>0 ? v : ''; };
+    addFood(hSel, {name, g:n('foodG'), kcal:n('foodK'), p:n('foodP'), f:n('foodF'), c:n('foodC')});
+    closeSheet(); renderHealth();
+  };
+  $('foodList').onclick = e => { const b = e.target.closest('[data-fdel]'); if (b){ state.food[hSel] = foodOn(hSel).filter(x=>x.id!==b.dataset.fdel); save(); renderHealth(); } };
+
+  // ---------- экран «Траты» ----------
+  let mPeriod = 'month', mAnchor = todayKey(), mCat = 'Еда';
+  function mRange(){
+    const a = fromKey(mAnchor);
+    if (mPeriod==='day') return [mAnchor];
+    if (mPeriod==='week'){ const mon = mondayOf(a); return [...Array(7)].map((_,i)=>key(addDays(mon,i))); }
+    return monthKeys(ymOf(mAnchor));
+  }
+  function mTitleText(){
+    if (mPeriod==='day') return dayLabel(mAnchor);
+    if (mPeriod==='month') return cap(ymTitle(ymOf(mAnchor)));
+    const ks = mRange(), a = fromKey(ks[0]), b = fromKey(ks[6]);
+    return a.getMonth()===b.getMonth() ? `${a.getDate()}–${b.getDate()} ${MONTHS_G[b.getMonth()]}` : `${a.getDate()} ${MONTHS_G[a.getMonth()].slice(0,3)} – ${b.getDate()} ${MONTHS_G[b.getMonth()].slice(0,3)}`;
+  }
+  function renderMoney(){
+    document.querySelectorAll('#mPeriod button').forEach(b=>b.classList.toggle('on', b.dataset.p===mPeriod));
+    $('mTitleP').textContent = mTitleText();
+    const ks = mRange(), list = spendIn(ks).sort((a,b)=>b.date.localeCompare(a.date)), sum = total(list);
+    $('mTotal').textContent = rub(sum);
+    const passed = ks.filter(k=>k<=todayKey()).length;
+    $('mAvg').textContent = mPeriod!=='day' && passed && sum ? `в среднем ${rub(sum/passed)} в день` : '';
+    const cats = byCat(list);
+    $('mCats').innerHTML = cats.length ? cats.map(([c,a])=>`<div class="catrow"><div class="tp">${c}<span><b>${rub(a)}</b> · ${Math.round(a/sum*100)}%</span></div><div class="bar"><i style="width:${a/cats[0][1]*100}%"></i></div></div>`).join('')
+      : `<div class="note" style="margin:0">Трат нет. Нажми плюс или скажи ассистенту «потратил 300 на такси».</div>`;
+    $('mCount').textContent = list.length ? `${list.length}` : '';
+    $('moneyList').innerHTML = list.map(x=>`<div class="entry"><div><div class="en">${esc(x.note || x.cat)}</div><div class="es">${[x.note ? x.cat : '', mPeriod!=='day' ? dayLabel(x.date,false) : ''].filter(Boolean).join(' · ') || 'трата'}</div></div><div class="rt"><span class="ev">${rub(x.amt)}</span><button class="x" data-mdel="${x.id}" aria-label="Удалить">${ICON_X}</button></div></div>`).join('')
+      || `<div class="note" style="margin:0">Пусто.</div>`;
+  }
+  $('mPeriod').onclick = e => { const b = e.target.closest('[data-p]'); if (b){ mPeriod = b.dataset.p; renderMoney(); } };
+  document.querySelector('#v-money .arrs').onclick = e => {
+    const b = e.target.closest('[data-mshift]'); if (!b) return;
+    const n = +b.dataset.mshift;
+    if (mPeriod==='day') mAnchor = shiftKey(mAnchor, n);
+    else if (mPeriod==='week') mAnchor = shiftKey(mAnchor, 7*n);
+    else { const a = fromKey(mAnchor); mAnchor = key(new Date(a.getFullYear(), a.getMonth()+n, 1)); }
+    renderMoney();
+  };
+  $('moneyList').onclick = e => { const b = e.target.closest('[data-mdel]'); if (b){ state.spend = state.spend.filter(x=>x.id!==b.dataset.mdel); save(); renderMoney(); } };
+  function renderMoneyForm(){ pills('mCatPills', SPEND_CATS.map(c=>[c,c]), mCat, 'mc'); }
+  $('mCatPills').onclick = e => { const b = e.target.closest('[data-mc]'); if (b){ mCat = b.dataset.mc; renderMoneyForm(); } };
+  function openMoney(){
+    $('mAmt').value=''; $('mNote').value='';
+    $('mDate').value = mPeriod==='day' ? mAnchor : todayKey();
+    renderMoneyForm(); openSheet($('moneySheet')); setTimeout(()=>$('mAmt').focus(),280);
+  }
+  $('mSave').onclick = () => {
+    const a = parseFloat(String($('mAmt').value).replace(',','.'));
+    if (!a || a<=0){ $('mAmt').focus(); return; }
+    state.spend.push({id:uid(), date:$('mDate').value || todayKey(), amt:a, cat:mCat, note:$('mNote').value.trim()});
+    save(); closeSheet(); renderMoney();
+  };
+
+  // ---------- экран «Итоги» ----------
+  function renderStats(){
+    const mon = mondayOf(new Date()), t = todayKey();
+    const weekKs = [...Array(7)].map((_,i)=>key(addDays(mon,i)));
+    const ks = weekKs.filter(k => k<=t && k>=state.createdAt);
+    let all = 0, done = 0;
+    const per = {};
+    for (const k of ks){ const it = itemsOn(k); all += it.length; const d = it.filter(i=>i.done).length; done += d; per[k] = [it.length, d]; }
+    const sl = ks.map(sleepMin).filter(Boolean);
+    const avgSleep = sl.length ? Math.round(sl.reduce((a,b)=>a+b,0)/sl.length) : 0;
+    const waterDays = ks.filter(k => (state.habits[k]?.ml||0) >= waterGoal()).length;
+    $('statgrid').innerHTML = `
+      <div class="stat"><div class="v">${all ? Math.round(done/all*100)+'%' : '—'}</div><div class="l">дел выполнено</div></div>
+      <div class="stat"><div class="v">${days(sugarStreak())}</div><div class="l">без сахара подряд</div></div>
+      <div class="stat"><div class="v">${avgSleep ? fmtDur(avgSleep).replace(' мин',' м') : '—'}</div><div class="l">средний сон</div></div>
+      <div class="stat"><div class="v">${ks.length ? waterDays+' из '+ks.length : '—'}</div><div class="l">дней с нормой воды</div></div>`;
+    $('bars').innerHTML = `<div class="ch"><b>Дела по дням</b><span>${done} из ${all}</span></div><div class="cols">${weekKs.map((k,i)=>{
+      const p = per[k] || [0,0], h = p[1] ? Math.max(6, p[1]/p[0]*100) : 0;
+      return `<div class="col ${k===t?'today':''}"><div class="b"><i style="height:${h}%"></i></div><span class="d">${WD[i]}</span></div>`; }).join('')}</div>`;
+    const wSpend = total(spendIn(weekKs));
+    const kd = ks.filter(k=>foodOn(k).length);
+    const kcal = kd.length ? Math.round(kd.reduce((a,k)=>a+foodTotals(k).kcal,0)/kd.length) : 0;
+    const x = xp();
+    $('cats').innerHTML = `
+      <div class="kv">Потрачено за неделю<span>${rub(wSpend)}</span></div>
+      <div class="kv">Калорий в день, в среднем<span>${kcal ? fmtNum(kcal) : '—'}</span></div>
+      <div class="kv">Серия дней с делами<span>${days(streak())}</span></div>
+      <div class="kv">Уровень<span>${Math.floor(x/100)+1}, до следующего ${100 - x%100} XP</span></div>`;
+    const rk = weekKs.filter(k => state.reflect[k]);
+    const avg = rk.length ? rk.reduce((a,k)=>a+state.reflect[k].score,0)/rk.length : 0;
+    $('refWeek').innerHTML = `<div class="ch"><b>Оценки дней</b><span>${rk.length ? 'в среднем '+fmtNum(avg,1)+' из 10' : ''}</span></div>` +
+      (rk.length ? `<div class="rlist">${[...rk].reverse().map(k=>`<div class="ri"><div class="rh">${cap(dayLabel(k,false))}, ${WD[(fromKey(k).getDay()+6)%7].toLowerCase()}<span>${state.reflect[k].score}/10</span></div>${state.reflect[k].text ? `<p>${esc(state.reflect[k].text)}</p>` : ''}</div>`).join('')}</div>`
+        : `<div class="note" style="margin:0">Оценки появятся после первой вечерней рефлексии.</div>`);
+  }
+
+  // ---------- рефлексия ----------
+  let refKey = null, refScore = 0;
+  function renderRate(){ $('refRate').innerHTML = [...Array(10)].map((_,i)=>`<button class="${refScore===i+1?'on':''}" data-r="${i+1}" aria-label="Оценка ${i+1}">${i+1}</button>`).join(''); }
+  $('refRate').onclick = e => { const b = e.target.closest('[data-r]'); if (b){ refScore = +b.dataset.r; renderRate(); } };
+  function openReflect(k){
+    refKey = k; const r = state.reflect[k];
+    refScore = r ? r.score : 0; $('refText').value = r ? r.text : '';
+    $('refDate').textContent = cap(dayLabel(k,false));
+    renderRate(); openSheet($('refSheet'));
+  }
+  $('refSave').onclick = () => {
+    if (!refScore){ notify('Поставь оценку дню от 1 до 10.'); return; }
+    state.reflect[refKey] = { score: refScore, text: $('refText').value.trim(), at: Date.now() };
+    save(); closeSheet(); renderAll(); notify(`Рефлексия сохранена: ${refScore}/10.`);
+  };
+  // минуты до отбоя (с учётом отбоя после полуночи); null — если уже спим
+  function sleepAbs(){ let s = toMin(state.settings.sleep), w = toMin(state.settings.wake); if (s <= w) s += 1440; return s; }
+  function minutesToSleep(){
+    const w = toMin(state.settings.wake); let n = nowMin();
+    const s = sleepAbs(); if (s >= 1440 && n < w) n += 1440;
+    return s - n;
+  }
+  // за какой день сейчас рефлексия (если отбой после полуночи — за вчера)
+  const reflectDayKey = () => (sleepAbs() >= 1440 && nowMin() < toMin(state.settings.wake)) ? shiftKey(todayKey(),-1) : todayKey();
+  function allDoneCheck(k, fromTap){
+    if (k !== reflectDayKey()) { if (fromTap) notify('День закрыт. Все дела выполнены.'); return null; }
+    const its = itemsOn(k);
+    if (!its.length || !its.every(i=>i.done)) return null;
+    const left = minutesToSleep() - 5;
+    if (left < 15){ if (fromTap) notify('День закрыт. Все дела выполнены.'); return null; }
+    const nk = 'fun|'+k;
+    if (state.notified[nk]) { if (fromTap) notify(`Все дела сделаны. До рефлексии и сна ${fmtDur(left)} свободы.`); return null; }
+    state.notified[nk] = true;
+    const msg = `Все дела на сегодня выполнены. До сна ${fmtDur(left)}: это время на отдых и развлечения. В ${fromMin(toMin(state.settings.sleep)-5)} откроется рефлексия.`;
+    state.chat.push({who:'bot', text: msg}); save();
+    notify(msg);
+    return msg;
+  }
+
+  // ---------- уведомления ----------
+  let toastTimer, toastQueue = [];
+  function notify(text){ toastQueue.push(text); if (toastQueue.length === 1) showNext(); }
+  function showNext(){
+    if (!toastQueue.length) return;
+    $('toastBody').textContent = toastQueue[0];
+    $('toast').classList.add('on');
+    haptic('success');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 4500);
+  }
+  function hideToast(){ $('toast').classList.remove('on'); toastQueue.shift(); if (toastQueue.length) setTimeout(showNext, 500); }
+  $('toast').onclick = () => { clearTimeout(toastTimer); hideToast(); };
+
+  function checkReminders(){
+    const k = todayKey(), now = nowMin();
+    for (const i of timed(k)){
+      if (i.done || !i.remind) continue;
+      const start = toMin(i.time);
+      for (const off of REMIND_OFFS){
+        const nk = `${i.id}|${k}|${off}`;
+        if (state.notified[nk]) continue;
+        if (now >= start-off && now < start-off+5 && now < start){
+          state.notified[nk] = true; save();
+          notify(`Через ${fmtDur(start-now)}: ${i.title} в ${i.time}`);
+        }
+      }
+    }
+    const w = freeWindows(k).find(([s,e]) => s<=now && now<e && e-s>=30);
+    if (w){
+      const nk = `free|${k}|${w[1]}`;
+      if (!state.notified[nk]){
+        state.notified[nk] = true; save();
+        const next = timed(k).find(i => toMin(i.time) >= w[1]);
+        notify(`Свободное окно: ${fmtDur(w[1]-Math.max(now,w[0]))}${next ? ` до «${next.title}»` : ' до отбоя'}.`);
+      }
+    }
+    // рефлексия за 5 минут до сна
+    const rk = reflectDayKey(), mts = minutesToSleep();
+    if (mts <= 5 && mts > -120 && !state.reflect[rk] && !state.notified['reflect|'+rk]){
+      state.notified['reflect|'+rk] = true; save();
+      notify('5 минут до сна. Оцени день и запиши рефлексию.');
+      if (!openSheetEl) openReflect(rk);
+    }
+    allDoneCheck(rk, false);
+    if (now >= SUGAR_NUDGE && !state.sugar[k] && !state.notified['sugar|'+k]){
+      state.notified['sugar|'+k] = true; save();
+      notify(`Сегодня был без сахара? Отметь в «Здоровье». Сейчас серия: ${days(sugarStreak())}.`);
+    }
+  }
+  // отчёт по тратам: 1-го числа в 00:01 за прошедший месяц
+  function checkMonthly(){
+    const n = new Date();
+    if (n.getDate()===1 && n.getHours()===0 && n.getMinutes()<1) return;
+    const prev = prevYm(ymOf(todayKey()));
+    if (state.reports[prev]) return;
+    state.reports[prev] = true;
+    if (ymOf(state.createdAt) > prev){ save(); return; }
+    const r = monthReport(prev);
+    state.chat.push({who:'bot', text:r.text, list:r.list||[]});
+    save();
+    notify(`Отчёт по тратам за ${ymTitle(prev)}: ${rub(total(spendIn(monthKeys(prev))))}. Подробно в ассистенте.`);
+  }
+  $('bell').onclick = () => {
+    const k = todayKey(), now = nowMin();
+    const next = timed(k).find(i => !i.done && toMin(i.time) >= now);
+    const left = untimed(k).filter(i=>!i.done).length, free = freeTotal(k);
+    let s = next ? `Дальше: ${next.title} в ${next.time}, через ${fmtDur(toMin(next.time)-now)}.` : 'По расписанию на сегодня всё.';
+    s += ` Свободно до отбоя: ${free ? fmtDur(free) : 'нет'}.`;
+    if (left) s += ` Задач без времени осталось: ${left}.`;
+    notify(s);
+  };
+  setInterval(()=>{ checkReminders(); checkMonthly(); if (view==='day' && sel===todayKey()) renderDay(); }, 30000);
+
+  // =====================================================================
+  // АССИСТЕНТ
+  // =====================================================================
+  const WEEKDAYS = [['понедельник',1,'пн'],['вторник',2,'вт'],['сред',3,'ср'],['четверг',4,'чт'],['пятниц',5,'пт'],['суббот',6,'сб'],['воскресен',0,'вс']];
+  const WORDNUM = {'один':1,'одну':1,'одна':1,'два':2,'две':2,'три':3,'четыре':4,'пять':5,'шесть':6,'полтора':1.5,'полторы':1.5};
+  const NUM = '(\\d+(?:[.,]\\d+)?)';
+  const UNIT_AFTER = '(?!\\d|[:.]\\d|\\s*(?:час|ч(?:\\s|$|,)|мин|мл|л(?:\\s|$|,)|литр|г(?:\\s|$|,)|гр|грамм|стак|руб|р(?:\\s|$|,)|₽|ккал|кал|дн|раз|%|тыс|к(?:\\s|$)))';
+  const TIME_G = new RegExp(`(?:^|\\s)(в|во|к|на|с|со|около|до)\\s+(\\d{1,2})(?:[:.\\s](\\d{2}))?(?:\\s*(утра|вечера|дня|ночи))?${UNIT_AFTER}`, 'g');
+  const SWEET = /сахар|сладк|конфет|шоколад|торт|пирожн|морожен|печень|вафл|зефир|мармелад|кол[аы](\s|$)|газировк|десерт|булочк|пончик|круассан|варень|(^|\s)мед(\s|$)|нутелл|чизкейк|батончик/;
+
+  function allTimes(s){
+    const out = []; let m; TIME_G.lastIndex = 0;
+    while ((m = TIME_G.exec(s))){
+      let h = +m[2], mi = m[3] ? +m[3] : 0;
+      if (h>23 || mi>59) continue;
+      if ((m[4]==='вечера' || m[4]==='дня') && h<12) h += 12;
+      if (m[4]==='ночи' && h===12) h = 0;
+      out.push({prep:m[1], time:`${pad(h)}:${pad(mi)}`, raw:m[0], index:m.index});
+    }
+    const bare = s.match(/(?:^|\s)(\d{1,2}):(\d{2})(?=\s|$|,)/);
+    if (!out.length && bare && +bare[1]<24) out.push({prep:'', time:`${pad(+bare[1])}:${bare[2]}`, raw:bare[0], index:bare.index});
+    return out;
+  }
+  function parseTimeRange(s){
+    const ts = allTimes(s);
+    const a = ts.find(t=>t.prep==='с'||t.prep==='со'), b = ts.find(t=>t.prep==='до');
+    if (a && b){ let d = toMin(b.time)-toMin(a.time); if (d<=0) d += 1440; return {time:a.time, dur:d}; }
+    const first = ts.find(t=>t.prep!=='до');
+    return first ? {time:first.time} : null;
+  }
+  function parseDur(s){
+    let m = s.match(new RegExp(`(?:на|длительност\\S*|длится|продолжительност\\S*|по)\\s+${NUM}\\s*(?:час\\S*|ч)(?:\\s+(\\d+)\\s*(?:мин\\S*|м))?(?=\\s|$|,)`));
+    if (m) return Math.round(parseFloat(m[1].replace(',','.'))*60 + (m[2]?+m[2]:0));
+    m = s.match(/(?:на|длительност\S*|длится|продолжительност\S*|по)\s+(\d+)\s*мин/);
+    if (m) return +m[1];
+    if (/(?:на|длится)\s+полчаса/.test(s)) return 30;
+    m = s.match(/(?:на|длительност\S*|длится)\s+(полтора|пол|один|два|три|четыре|пять)?\s*час(?!\S*\s+(позже|раньше))/);
+    if (m){ const w = m[1]; return w==='полтора' ? 90 : w==='пол' ? 30 : w ? (WORDNUM[w]||1)*60 : 60; }
+    return null;
+  }
+  function parseDay(s){
+    const base = new Date();
+    if (/послезавтра/.test(s)) return key(addDays(base,2));
+    if (/завтра/.test(s)) return key(addDays(base,1));
+    if (/позавчера/.test(s)) return key(addDays(base,-2));
+    if (/(^|\s)вчера/.test(s)) return key(addDays(base,-1));
+    if (/сегодня/.test(s)) return key(base);
+    for (const [w,n] of WEEKDAYS){
+      if (new RegExp('(^|\\s)(в|во|на)\\s+'+w).test(s)){ let d = (n-base.getDay()+7)%7; if (!d) d = 7; return key(addDays(base,d)); }
+    }
+    const m = s.match(/(\d{1,2})\s+(январ|феврал|март|апрел|ма[яй]|июн|июл|август|сентябр|октябр|ноябр|декабр)/);
+    if (m){
+      const mi = MONTH_STEMS.findIndex(x => m[2].startsWith(x));
+      let d = new Date(base.getFullYear(), mi, +m[1]);
+      if (d < addDays(base,-60)) d = new Date(base.getFullYear()+1, mi, +m[1]);
+      return key(d);
+    }
+    const n = s.match(/(\d{1,2})\s*(?:-?го|числа)(?=\s|$)/);
+    if (n){ let d = new Date(base.getFullYear(), base.getMonth(), +n[1]); if (d < addDays(base,-1)) d = new Date(base.getFullYear(), base.getMonth()+1, +n[1]); return key(d); }
+    return null;
+  }
+  function weekdaysIn(s){
+    const out = [];
+    for (const [w,n,ab] of WEEKDAYS) if (new RegExp(`(^|[\\s,])(${w}\\S*|${ab})(?=[\\s,]|$)`).test(s)) out.push(n);
+    return out;
+  }
+  function parseRepeat(s){
+    if (/каждый день|ежедневно|каждое утро|каждый вечер|всегда|навсегда|закрепи/.test(s)){ const ds = weekdaysIn(s); return ds.length ? ds : [0,1,2,3,4,5,6]; }
+    if (/по будням|в будни|каждый будний|по рабочим/.test(s)) return [1,2,3,4,5];
+    if (/по выходным|в выходные|каждые выходные/.test(s)) return [0,6];
+    if (/(кажд\S*|по)\s+(понедельник|вторник|сред|четверг|пятниц|суббот|воскресен|пн|вт|ср|чт|пт|сб|вс)/.test(s)) return weekdaysIn(s);
+    return null;
+  }
+  function parseCat(s){
+    const m = s.match(/(?:категори\S*|сфер\S*|#)\s*(учеб\S*|спорт|работ\S*|личн\S*|уход)/);
+    if (!m) return null;
+    const c = m[1]; return c.startsWith('учеб') ? 'Учёба' : c.startsWith('спорт') ? 'Спорт' : c.startsWith('работ') ? 'Работа' : c.startsWith('личн') ? 'Личное' : 'Уход';
+  }
+  function guessCat(s){
+    if (/зал|трениров|бег|пробеж|лыж|теннис|корт|бассейн|йог|растяж|кардио|футбол|спорт|зарядк|отжим|качалк/.test(s)) return 'Спорт';
+    if (/пар[аыу]|лекци|семинар|линал|учеб|домашк|контрольн|экзамен|универ|курсов|зачет|(^|\s)дз(\s|$)|коллоквиум/.test(s)) return 'Учёба';
+    if (/созвон|встреч|работ|магазин|клиент|звонок|позвонить|отчет|команд|проект|почт|заявк|бизнес|питч|инвест/.test(s)) return 'Работа';
+    if (/умыт|зуб|душ|процедур|уход|крем|маск|побрит|ногт|стрижк/.test(s)) return 'Уход';
+    return 'Личное';
+  }
+  function parsePart(s){
+    if (/(^|\s)(утром|с утра|утренн)/.test(s)) return 'Утро';
+    if (/(^|\s)(вечером|вечерн|перед сном)/.test(s)) return 'Вечер';
+    if (/(^|\s)(днем|в обед|после обеда|дневн)/.test(s)) return 'День';
+    return null;
+  }
+  const STRIP = [
+    /(^|\s)со?\s+\d{1,2}(?:[:.]\d{2})?\s+до\s+\d{1,2}(?:[:.]\d{2})?/g,
+    new RegExp(`(?:на|длительност\\S*|длится|продолжительност\\S*|по)\\s+${NUM}\\s*(?:час\\S*|ч)(?:\\s+\\d+\\s*(?:мин\\S*|м))?(?=\\s|$|,)`,'g'),
+    /(?:на|длительност\S*|длится|продолжительност\S*|по)\s+\d+\s*мин\S*/g,
+    /(?:на|длится)\s+полчаса/g,
+    /(?:на|длительност\S*|длится)\s+(?:полтора|пол|один|два|три|четыре|пять)?\s*час\S*/g,
+    /напомн\S*(\s+(мне|за)\s*\d+\s*(мин\S*|час\S*|ч))?(\s+до)?/g,
+    /без напоминан\S*/g,
+    /(^|\s)(послезавтра|позавчера|завтра|сегодня|вчера|ежедневно|всегда|навсегда)(?=\s|$)/g,
+    /(каждый день|каждое утро|каждый вечер|по будням|в будни|каждый будний день|каждый будний|по рабочим дням|по выходным|в выходные|каждые выходные|закрепи\S*)/g,
+    /(^|[\s,])(кажд\S*|по|в|во|на|и)?\s*(понедельник\S*|вторник\S*|сред[аеуы]\S*|четверг\S*|пятниц\S*|суббот\S*|воскресень\S*|пн|вт|ср|чт|пт|сб|вс)(?=[\s,]|$)/g,
+    /\d{1,2}\s+(январ|феврал|март|апрел|ма[яй]|июн|июл|август|сентябр|октябр|ноябр|декабр)\S*/g,
+    /\d{1,2}\s*(?:-?го|числа)(?=\s|$)/g,
+    /(?:категори\S*|сфер\S*|#)\s*(учеб\S*|спорт|работ\S*|личн\S*|уход)/g,
+    /(^|\s)(утром|с утра|вечером|перед сном|днем|в обед|после обеда)(?=\s|$)/g,
+  ];
+  function stripAll(s){
+    let t = ' '+s+' ';
+    for (const r of STRIP.slice(0,1)) t = t.replace(r, ' ');
+    TIME_G.lastIndex = 0; t = t.replace(TIME_G, ' ');
+    t = t.replace(/(?:^|\s)\d{1,2}:\d{2}(?=\s|$|,)/g, ' ');
+    for (const r of STRIP.slice(1)) t = t.replace(r, ' ');
+    return t.replace(/\s+/g,' ').trim();
+  }
+  function cleanTitle(s){
+    const t = stripAll(s)
+      .replace(/^(\s*(у меня|мне надо|мне нужно|нужно|надо|поставь|добавь|запиши|запланируй|создай|сделай|а|и|еще|задачу|задача|дело|потом|затем)(?=\s|$))+/,' ')
+      .replace(/\s+/g,' ').trim().replace(/^[,.\-–—:]+|[,.\-–—:]+$/g,'').trim();
+    return cap(t);
+  }
+
+  // нечёткий поиск задачи по названию
+  const STOP = new Set(['на','в','во','с','со','к','и','а','мою','мой','мне','задачу','задача','задачи','дело','дела','время','у','меня','это','эту','этот','про','по','из','за','до','от','все','всё','только','мероприятие','событие']);
+  const words = s => s.toLowerCase().replace(/ё/g,'е').replace(/[^а-яa-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>=2 && !STOP.has(w));
+  const stem = w => w.length<=3 ? w : w.slice(0, Math.max(3, Math.min(w.length-1, 5)));
+  function score(q, title){
+    const qw = words(q).map(stem), tw = words(title).map(stem);
+    if (!qw.length) return 0;
+    let hit = 0;
+    for (const a of qw) if (tw.some(b => a===b || (a.length>=3 && b.length>=3 && (a.startsWith(b) || b.startsWith(a))))) hit++;
+    return hit / qw.length;
+  }
+  function findTarget(q, day){
+    const d0 = day || todayKey();
+    const future = []; for (let i=1;i<=30;i++) future.push(...itemsOn(shiftKey(d0,i)).filter(x=>x.kind==='task'));
+    const pools = [itemsOn(d0), future, state.routines.map(r=>({kind:'routine', ref:r, id:r.id, title:r.title, time:r.time, dur:r.dur, part:r.part, cat:r.cat, remind:r.remind, pinned:true}))];
+    for (const pool of pools){
+      let best = null, bs = 0;
+      for (const it of pool){ const sc = score(q, it.title); if (sc > bs){ bs = sc; best = it; } }
+      if (best && bs >= 0.5) return {item:best, day: best.kind==='task' ? best.ref.date : d0};
+    }
+    return null;
+  }
+  const taskWord = it => `«${it.title}»${it.time ? ' в '+it.time : ''}`;
+
+  function periodKeys(s){
+    const t = todayKey();
+    if (/прошл\S* недел/.test(s)){ const mon = mondayOf(addDays(new Date(),-7)); return {ks:[...Array(7)].map((_,i)=>key(addDays(mon,i))), label:'прошлую неделю'}; }
+    if (/недел/.test(s)){ const mon = mondayOf(new Date()); return {ks:[...Array(7)].map((_,i)=>key(addDays(mon,i))), label:'эту неделю'}; }
+    if (/прошл\S* месяц/.test(s)){ const ym = prevYm(ymOf(t)); return {ks:monthKeys(ym), label:ymTitle(ym)}; }
+    if (/месяц/.test(s)) return {ks:monthKeys(ymOf(t)), label:'этот месяц'};
+    const d = parseDay(s) || t;
+    return {ks:[d], label:dayLabel(d,false)};
+  }
+  function answerQuery(s, day){
+    if (/(вод[аыуе]|выпил|(^|\s)пил)/.test(s) && !/потратил/.test(s)){
+      const ml = hab(day).ml, g = waterGoal();
+      return `За ${dayLabel(day,false)} выпито ${liters(ml)} из ${liters(g)}${ml>=g ? ', норма выполнена.' : `, осталось ${liters(g-ml)}.`}`;
+    }
+    if (/потратил|трат|расход|деньг/.test(s)){
+      const {ks, label} = periodKeys(s);
+      let list = spendIn(ks);
+      const CAT_RE = {'Еда':/(на|по)\s+(ед[уыае]|продукт|обед|кафе)/,'Транспорт':/(на|по)\s+(транспорт|такси|метро)/,'Жильё':/(на|по)\s+(жиль|квартир|аренд)/,'Учёба':/(на|по)\s+учеб/,'Спорт':/(на|по)\s+спорт/,'Развлечения':/(на|по)\s+развлеч/,'Покупки':/(на|по)\s+покупк/,'Другое':/(на|по)\s+друго/};
+      const cm = SPEND_CATS.find(c => CAT_RE[c].test(s));
+      if (cm) list = list.filter(x=>x.cat===cm);
+      const sum = total(list);
+      if (!list.length) return `За ${label}${cm?` в категории «${cm}»`:''} трат не записано.`;
+      const cats = byCat(list);
+      return { text:`За ${label}${cm?` в категории «${cm}»`:''} потрачено ${rub(sum)}.`, list: cm ? list.map(x=>({l:dayLabel(x.date,false), t:`${x.note||x.cat}: ${rub(x.amt)}`})) : cats.map(([c,a])=>({l:Math.round(a/sum*100)+'%', t:`${c}: ${rub(a)}`})) };
+    }
+    if (/сахар/.test(s)){
+      const n = sugarStreak(), b = sugarBest();
+      return n ? `Ты уже ${days(n)} без сахара. Рекорд: ${days(b)}.` : `Сейчас серия без сахара: 0 дней${b ? `, рекорд ${days(b)}` : ''}.`;
+    }
+    if (/съел|(^|\s)ел(\s|$)|еда|калори|ккал|бжу|белк|жир|углевод|питани/.test(s)){
+      const t = foodTotals(day), fl = foodOn(day);
+      if (!fl.length) return `За ${dayLabel(day,false)} еда не записана.`;
+      return { text:`За ${dayLabel(day,false)}: ${fmtNum(t.kcal)} ккал, белки ${fmtNum(t.p,1)} г, жиры ${fmtNum(t.f,1)} г, углеводы ${fmtNum(t.c,1)} г.`, list: fl.map(x=>({l:x.g?fmtNum(x.g)+' г':'—', t:x.name})) };
+    }
+    if (/спал|(^|\s)сон|поспал/.test(s)){
+      const m = sleepMin(day);
+      return m ? `Сон в ночь на ${dayLabel(day,false)}: ${fmtDur(m)} (лёг ${hab(day).bed}, встал ${hab(day).wake}).` : `Сон за ${dayLabel(day,false)} не записан.`;
+    }
+    if (/рефлекси|оценк|оценил/.test(s)){
+      const r = state.reflect[day];
+      return r ? { text:`${cap(dayLabel(day,false))}: ${r.score}/10.${r.text ? '\n'+r.text : ''}` } : `Рефлексия за ${dayLabel(day,false)} не заполнена.`;
+    }
+    if (/свободн/.test(s)){
+      const wins = freeWindows(day), tot = wins.reduce((a,[x,y])=>a+y-x,0);
+      if (!tot) return `На ${dayLabel(day,false)} свободного времени нет.`;
+      return { text:`На ${dayLabel(day,false)} свободно ${fmtDur(tot)}. Окна:`, list: wins.map(([a,b])=>({l:fromMin(a), t:`до ${fromMin(b)}, ${fmtDur(b-a)}`})) };
+    }
+    if (/сделал|выполнил|закрыл|осталось|успел/.test(s)){
+      const its = itemsOn(day), d = its.filter(i=>i.done), left = its.filter(i=>!i.done);
+      if (!its.length) return `На ${dayLabel(day,false)} дел нет.`;
+      return { text:`За ${dayLabel(day,false)} сделано ${d.length} из ${its.length}.${left.length ? ' Осталось:' : ' Всё закрыто.'}`, list: left.map(i=>({l:i.time||'—', t:i.title})) };
+    }
+    if (/что у меня|какие (у меня )?(дела|задачи|планы)|план|расписани|когда у меня|дела/.test(s)){
+      const its = itemsOn(day).sort((a,b)=>(a.time||'99').localeCompare(b.time||'99'));
+      if (!its.length) return `На ${dayLabel(day,false)} пока ничего нет.`;
+      return { text:`На ${dayLabel(day,false)}: ${its.length} ${plural(its.length,'дело','дела','дел')}, осталось ${its.filter(i=>!i.done).length}.`, list: its.map(i=>({l:i.time||'—', t:i.title + (i.done?' ✓':'')})) };
+    }
+    return null;
+  }
+
+  const HELP = `Я управляю всем приложением. Примеры:
+• «Завтра с 10 до 11:30 пара» или «в пятницу в 18 теннис на 2 часа»
+• «По понедельникам и средам в 9 зарядка» — закреплю навсегда
+• «Вечером купить продукты» — задача без времени
+• «Перенеси теннис на 19:30», «сдвинь пару на час позже», «перенеси созвон на завтра»
+• «Поменяй длительность зала на 1,5 часа», «переименуй зал в бассейн»
+• «Удали теннис», «убери зарядку только на завтра», «удали все дела на завтра»
+• «Сделал зарядку» — отмечу выполненным
+• «Выпил 500 мл воды», «спал 7 часов», «лёг в 0:30, встал в 8»
+• «Съел курицу 200 г 330 ккал бжу 40/15/0»
+• «Сегодня без сахара» или «съел шоколадку»
+• «Потратил 450 на обед», «удали последнюю трату»
+• «Сколько я выпил / сделал / потратил за неделю / съел / спал?»
+• «Отчёт по тратам за сентябрь»
+• «Оценка дня 8, много успел, но лёг поздно» — запишу рефлексию
+Напоминания приходят за 60, 30 и 15 минут. Не нужны — добавь «без напоминаний».
+Без интернета я работаю в офлайн-режиме и понимаю команды вроде этих примеров.`;
+
+  function assistant(text){
+    const hasQ = /\?/.test(text);
+    const s = ' ' + text.toLowerCase().replace(/ё/g,'е').replace(/[?!]/g,' ').replace(/\s+/g,' ').trim() + ' ';
+    const day = parseDay(s) || todayKey();
+
+    if (/что ты умеешь|помощ|команды|как тобой/.test(s)) return { text: HELP };
+
+    // отчёт по тратам
+    if (/(отчет|итог\S*|статистик\S*|сводк\S*)/.test(s) && /(трат|расход|деньг|месяц|январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/.test(s)){
+      const mm = s.match(/(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/);
+      let ym = prevYm(ymOf(todayKey()));
+      if (mm){
+        const mi = MONTH_STEMS.findIndex(x=>mm[1].startsWith(x));
+        const y = new Date().getFullYear(); ym = `${mi > new Date().getMonth() ? y-1 : y}-${pad(mi+1)}`;
+      } else if (/(этот|текущ)\S* месяц/.test(s)) ym = ymOf(todayKey());
+      return monthReport(ym);
+    }
+
+    const isQ = hasQ || /(^|\s)(сколько|какой|какая|какие|какое|покажи|расскажи|что у меня|когда у меня|есть ли|много ли|успел ли)(\s|$)/.test(s);
+    if (isQ){ const r = answerQuery(s, day); if (r) return typeof r==='string' ? {text:r} : r; }
+
+    // рефлексия голосом/текстом: «оценка дня 8, был продуктивный день»
+    const RM = /(?:оценка дня|оцениваю день|оценю день|день на|оценка)\s*(?:на\s*)?(10|[1-9])(?:\s*(?:из|\/)\s*10)?/i;
+    const rm = s.match(RM);
+    if (rm && /(оценк|оцени|день на)/.test(s)){
+      const sc = +rm[1];
+      const orig = ' ' + text.replace(/\s+/g,' ').trim() + ' ';
+      const rmo = orig.match(RM);
+      const txt = cap((rmo ? orig.replace(rmo[0],' ') : orig).replace(/(^|\s)(рефлексия|сегодня|вчера)(?=\s|$)/gi,' ').replace(/\s+/g,' ').trim().replace(/^[,.:\-–—]+\s*/,''));
+      state.reflect[day] = { score: sc, text: txt, at: Date.now() }; save();
+      return { text:`Записал рефлексию за ${dayLabel(day,false)}: ${sc}/10.${txt ? ' «'+txt+'»' : ''}` };
+    }
+    if (/(^|\s)(рефлекси|открой рефлекси|хочу оценить день)/.test(s) && !isQ){ setTimeout(()=>openReflect(reflectDayKey()), 50); return { text:'Открыл анкету рефлексии.' }; }
+
+    // убавить воду
+    if (/(убери|минус|отними|удали|убавь)/.test(s) && /(вод|мл|стакан)/.test(s)){
+      const ml = waterAmount(s) || 250; addWater(day, -ml);
+      return { text:`Убрал ${liters(ml)}. Сейчас ${liters(hab(day).ml)} из ${liters(waterGoal())}.` };
+    }
+
+    // удаление
+    if (/(^|\s)(удали|удалить|убери|убрать|отмени|отменить|вычеркни|сотри|снеси)(\s|$)/.test(s) && !/отметк|галочк/.test(s)){
+      if (/последн\S*\s+(трат|расход|покупк)/.test(s) || /(трат|расход)\S*\s+последн/.test(s)){
+        const x = state.spend[state.spend.length-1]; if (!x) return {text:'Трат пока нет.'};
+        state.spend.pop(); save(); return { text:`Удалил трату ${rub(x.amt)} (${x.note||x.cat}, ${dayLabel(x.date,false)}).` };
+      }
+      if (/последн\S*\s+(ед|прием|запис)/.test(s)){
+        const fl = foodOn(day); if (!fl.length) return {text:`За ${dayLabel(day,false)} еды нет.`};
+        const x = fl.pop(); save(); return { text:`Удалил «${x.name}» из питания.` };
+      }
+      if (/(все|всё)\s+(дела|задачи)/.test(s)){
+        const n = state.tasks.filter(t=>t.date===day).length;
+        state.tasks = state.tasks.filter(t=>t.date!==day); save(); sel = day;
+        return { text: n ? `Удалил ${n} ${plural(n,'дело','дела','дел')} на ${dayLabel(day,false)}. Закреплённые остались.` : `На ${dayLabel(day,false)} разовых дел нет.` };
+      }
+      const q = stripAll(s.replace(/(^|\s)(удали|удалить|убери|убрать|отмени|отменить|вычеркни|сотри|снеси)(?=\s|$)/g,' ').replace(/только/g,' ').replace(/закрепленн\S*|повторяющ\S*/g,' '));
+      const pd = parseDay(s);
+      const found = findTarget(q, pd);
+      if (!found) return { text:`Не нашёл задачу «${q.trim()}». Проверь название.` };
+      const {item} = found;
+      if (item.kind==='routine'){
+        if (/только/.test(s) || pd){ const d = pd || todayKey(); state.skips[item.id+'|'+d] = true; save(); sel = d; return { text:`Убрал ${taskWord(item)} только на ${dayLabel(d,false)}. Закреплённая задача осталась.` }; }
+        state.routines = state.routines.filter(r=>r.id!==item.id); save();
+        return { text:`Удалил закреплённую задачу ${taskWord(item)} совсем.` };
+      }
+      state.tasks = state.tasks.filter(t=>t.id!==item.id); save(); sel = item.ref.date;
+      return { text:`Удалил ${taskWord(item)} на ${dayLabel(item.ref.date,false)}.` };
+    }
+
+    // переименование
+    const rn = s.match(/переименуй\s+(.+?)\s+в\s+(.+)/);
+    if (rn){
+      const found = findTarget(rn[1], parseDay(s));
+      if (!found) return { text:`Не нашёл задачу «${rn[1].trim()}».` };
+      const nt = cap(rn[2].trim()); const old = found.item.title; found.item.ref.title = nt; save();
+      return { text:`Переименовал «${old}» в «${nt}».` };
+    }
+
+    // перенос, время, длительность
+    if (/(^|\s)(перенеси|перенести|сдвинь|передвинь|поменяй|измени|переставь|смести)(\s|$)/.test(s)){
+      const rest = ' ' + s.replace(/(^|\s)(перенеси|перенести|сдвинь|передвинь|поменяй|измени|переставь|смести)(?=\s|$)/g,' ').trim() + ' ';
+      const shift = rest.match(/(?:на|в)\s+(\d+(?:[.,]\d+)?|полчаса|час|полтора часа|два часа|три часа)\s*(час\S*|ч|мин\S*)?\s*(позже|раньше|вперед|назад)/);
+      const durWord = /(длительност|продолжительност)/.test(rest);
+      const durChange = durWord ? parseDur(rest.replace(/(длительност\S*|продолжительност\S*)(\s+\S+)?\s+на\s/,' на ')) : null;
+      let q = rest.replace(/(длительност\S*|продолжительност\S*|время)/g,' ');
+      if (shift) q = q.replace(shift[0], ' ');
+      q = stripAll(q).replace(/(^|\s)(позже|раньше|вперед|назад|сегодняшн\S*|завтрашн\S*)(?=\s|$)/g,' ');
+      const oldT = allTimes(rest).find(t=>t.prep==='с'||t.prep==='со');
+      const hintDay = /(сегодняшн|завтрашн)/.test(s) ? (/завтрашн/.test(s) ? shiftKey(todayKey(),1) : todayKey()) : null;
+      let found = q.trim() ? findTarget(q, hintDay) : null;
+      if (!found && oldT){ const d0 = hintDay||todayKey(); const it = timed(d0).find(i=>i.time===oldT.time); if (it) found = {item:it, day:d0}; }
+      if (!found) return { text:`Не нашёл, что переносить${q.trim() ? `: «${q.trim()}»` : ''}.` };
+      const it = found.item, ref = it.ref, was = taskWord(it);
+      const changes = [];
+      if (shift){
+        if (!ref.time) return { text:`У ${was} нет времени, сдвигать нечего. Скажи, например: «перенеси на 18:00».` };
+        const w = shift[1];
+        let mins;
+        if (/^\d/.test(w)) mins = shift[2] && /^мин/.test(shift[2]) ? parseFloat(w) : parseFloat(w.replace(',','.'))*60;
+        else mins = w==='полчаса' ? 30 : w==='полтора часа' ? 90 : w==='два часа' ? 120 : w==='три часа' ? 180 : 60;
+        const sign = /(раньше|назад)/.test(shift[3]) ? -1 : 1;
+        ref.time = fromMin(toMin(ref.time) + sign*Math.round(mins)); ref.part = partOf(ref.time); changes.push(`время ${ref.time}`);
+      } else if (!durWord){
+        const nt = allTimes(rest).filter(t=>['на','в','во','к','','около'].includes(t.prep)).pop();
+        if (nt){ const had = !!ref.time; ref.time = nt.time; ref.part = partOf(nt.time); if (!had) ref.remind = true; changes.push(`время ${nt.time}`); }
+      }
+      if (durChange){ ref.dur = durChange; changes.push(`длительность ${fmtDur(durChange)}`); }
+      else if (!shift && !durWord){ const d2 = parseDur(rest); if (d2){ ref.dur = d2; changes.push(`длительность ${fmtDur(d2)}`); } }
+      const afterNa = rest.split(/\sна\s/).slice(1).join(' на ');
+      const nd = (afterNa && parseDay(' на '+afterNa+' ')) || (!hintDay ? parseDay(rest) : null);
+      if (nd && !(it.kind==='task' && nd===ref.date)){
+        if (it.kind==='routine') return { text:`${cap(was)} закреплена и повторяется по дням, на дату её не перенести. Могу поменять ей время для всех дней.` };
+        ref.date = nd; changes.push(dayLabel(nd,false)); sel = nd;
+      }
+      if (!changes.length) return { text:`Понял, что речь про ${was}, но не понял, что поменять. Например: «перенеси на 19:00» или «на час позже».` };
+      clearNotified(it.id); save();
+      if (it.kind==='task') sel = ref.date;
+      return { text:`${cap(was)}: теперь ${changes.join(', ')}.${it.kind==='routine'?' Для всех дней повтора.':''}` };
+    }
+
+    // отметить сделанным / снять отметку
+    const unmark = /(сними отметку|сними галочку|убери галочку|не сделал|отмени отметку)/.test(s);
+    if (unmark || /(^|\s)(отметь|сделал|сделано|выполнил|выполнено|готово|закрыл|закончил|сходил|провел|умылся|почистил|заправил)(\s|$)/.test(s)){
+      let q = stripAll(s.replace(/(сними отметку|сними галочку|убери галочку|не сделал|отмени отметку|отметь|сделал|сделано|выполнил|выполнено|готово|закрыл|закончил|сходил|провел|как выполненн\S*|выполненн\S*)(?=\s|$)/g,' ').replace(/(^|\s)(с|со)(?=\s)/g,' '));
+      if (/умылся/.test(s)) q += ' умыться'; if (/почистил/.test(s)) q += ' почистить зубы'; if (/заправил/.test(s)) q += ' заправить кровать';
+      q = q.replace(/(^|\s)(умылся|почистил|заправил)(?=\s|$)/g,' ');
+      const d = parseDay(s) || todayKey();
+      let best = null, bs = 0;
+      // при равном совпадении — сначала невыполненные (или выполненные при снятии отметки), потом с более коротким названием
+      const rank = it => [score(q, it.title), (it.done === unmark) ? 1 : 0, -it.title.length];
+      for (const it of itemsOn(d)){ const r = rank(it); if (!best || r[0] > bs || (r[0]===bs && (r[1] > rank(best)[1] || (r[1]===rank(best)[1] && r[2] > rank(best)[2])))){ if (r[0] > 0){ bs = r[0]; best = it; } } }
+      if (!best || bs < 0.5) return { text:`Не нашёл «${q.trim()}» на ${dayLabel(d,false)}.` };
+      setDone(best, d, !unmark); sel = d;
+      const left = itemsOn(d).filter(i=>!i.done).length;
+      if (!unmark && !left){ const fm = allDoneCheck(d, false); if (fm){ state.chat.pop(); save(); return { text:`Отметил «${best.title}». ${fm}` }; } }
+      return { text: unmark ? `Снял отметку с «${best.title}».` : `Отметил «${best.title}». ${left ? `Осталось ${left}.` : 'День закрыт.'}` };
+    }
+
+    // сахар
+    if (/без сахара/.test(s) && !/(съел|сорвал)/.test(s)) return { text: markSugarSet(day,'clean') };
+    if (/(сорвал|был сахар|ел сладкое|съел сладкое)/.test(s) || (/(съел|поел|(^|\s)ел)\s/.test(s) && SWEET.test(s) && !/\d/.test(s))){
+      const m = markSugarSet(day,'ate');
+      const name = cleanFoodName(s);
+      const real = name && !/^(сладкое|сахар|что-то сладкое)$/i.test(name) && !/сорвал/.test(s);
+      if (real) addFood(day, {name});
+      return { text: m + (real ? ` «${name}» записал в питание.` : '') };
+    }
+
+    // вода
+    if (/(выпил|попил|выпито)/.test(s) || (/вод[аыу]/.test(s) && /(\d|стакан|литр|бутыл)/.test(s) && !/потратил|купил/.test(s))){
+      const ml = waterAmount(s) || 250, before = hab(day).ml;
+      addWater(day, ml); const h = hab(day).ml, g = waterGoal();
+      return { text:`Записал ${liters(ml)}. За ${dayLabel(day,false)} ${liters(h)} из ${liters(g)}${h>=g ? (before<g ? ', норма выполнена.' : '.') : `, осталось ${liters(g-h)}.`}` };
+    }
+
+    // сон
+    if (/(^|\s)(спал|поспал|лег|уснул|проснулся|встал)(\s|$)/.test(s) && !/будильник/.test(s)){
+      const h = hab(day);
+      const lm = s.match(/(?:лег|уснул)\S*\s+(?:в\s+)?(\d{1,2})(?:[:.](\d{2}))?/), wm = s.match(/(?:встал|проснулся)\S*\s+(?:в\s+)?(\d{1,2})(?:[:.](\d{2}))?/);
+      const hm = s.match(new RegExp(`${NUM}\\s*(час|ч)`));
+      if (lm && wm){ h.bed = `${pad(+lm[1]%24)}:${pad(+(lm[2]||0))}`; h.wake = `${pad(+wm[1])}:${pad(+(wm[2]||0))}`; }
+      else if (hm){ const mins = Math.round(parseFloat(hm[1].replace(',','.'))*60); h.wake = h.wake || state.settings.wake; h.bed = fromMin(toMin(h.wake) - mins); }
+      else if (wm) h.wake = `${pad(+wm[1])}:${pad(+(wm[2]||0))}`;
+      else if (lm) h.bed = `${pad(+lm[1]%24)}:${pad(+(lm[2]||0))}`;
+      else return { text:'Скажи, сколько спал: «спал 7 часов» или «лёг в 0:30, встал в 8».' };
+      save();
+      const sm = sleepMin(day), g = state.settings.sleepGoal*60;
+      return { text: sm ? `Сон: ${fmtDur(sm)}. ${sm>=g ? 'Норма выполнена.' : `До цели не хватило ${fmtDur(g-sm)}.`}` : 'Записал. Добавь второе время, чтобы посчитать сон.' };
+    }
+
+    // доходы
+    if (/(заработал|получил|пришл[иоа]|доход|зарплат)/.test(s) && /\d/.test(s) && !/потратил/.test(s)) return { text:'Сейчас я считаю только траты.' };
+
+    // траты
+    if (/(потратил|заплатил|купил|отдал|оплатил|трата|стоил)/.test(s) && /\d/.test(s)){
+      const sNoTime = s.replace(/\d{1,2}:\d{2}/g,' ');
+      const am = sNoTime.match(/(\d[\d\s]*(?:[.,]\d+)?)\s*(тыс|к(?=\s)|т\.?р|руб|р(?=\s)|₽)?/);
+      let amt = am ? parseFloat(am[1].replace(/\s/g,'').replace(',','.')) : 0;
+      if (am && am[2] && /^(тыс|к|т)/.test(am[2])) amt *= 1000;
+      if (!amt) return { text:'Не понял сумму. Например: «потратил 450 на обед».' };
+      const cat = spendCat(s);
+      let note = '';
+      const nm = s.match(/(?:на|за)\s+([а-яa-z][а-яa-z\s-]{1,40}?)(?=\s*(\d|$|,))/) || s.match(/купил\S*\s+([а-яa-z][а-яa-z\s-]{1,40}?)(?=\s+(за|на)\s|\s*\d|\s*$)/);
+      if (nm) note = cap(nm[1].trim().replace(/(^|\s)(сегодня|вчера|завтра|рублей|руб)(?=\s|$)/g,' ').trim());
+      state.spend.push({id:uid(), date:day, amt, cat, note}); save();
+      return { text:`Записал ${rub(amt)}${note?` («${note}»)`:''}, категория «${cat}». За ${dayLabel(day,false)} потрачено ${rub(total(spendIn([day])))}.` };
+    }
+
+    // еда
+    if (/(^|\s)(съел|поел|ел|завтракал|обедал|ужинал|перекусил|скушал)(\s|$)/.test(s)){
+      const fd = parseFood(s);
+      if (!fd.name) return { text:'Что именно съел? Например: «съел гречку с курицей 300 г 450 ккал бжу 30/10/50».' };
+      addFood(day, fd);
+      let txt = `Записал: ${fd.name}${fd.g?`, ${fmtNum(fd.g)} г`:''}${fd.kcal?`, ${fmtNum(fd.kcal)} ккал`:''}${(fd.p||fd.f||fd.c)?`, Б ${fmtNum(fd.p||0,1)} / Ж ${fmtNum(fd.f||0,1)} / У ${fmtNum(fd.c||0,1)}`:''}.`;
+      const t = foodTotals(day);
+      if (t.kcal || t.p || t.f || t.c) txt += ` За ${dayLabel(day,false)}: ${fmtNum(t.kcal)} ккал, Б ${fmtNum(t.p,1)} / Ж ${fmtNum(t.f,1)} / У ${fmtNum(t.c,1)}.`;
+      if (SWEET.test(s)) txt += ' ' + markSugarSet(day,'ate');
+      return { text: txt };
+    }
+
+    if (isQ) return { text:'Не понял вопрос. Спроси, например: «сколько я выпил сегодня?», «сколько потратил за неделю?», «что у меня завтра?».' };
+
+    return addTasks(s, day);
+  }
+
+  function markSugarSet(k, val){
+    if (state.sugar[k]===val){ const n = sugarStreak(); return val==='clean' ? `Уже отмечено. Ты ${days(n)} без сахара.` : 'Уже отмечено, что был сахар.'; }
+    return markSugar(k, val);
+  }
+  function waterAmount(s){
+    let m = s.match(/(\d+)\s*мл/); if (m) return +m[1];
+    m = s.match(/(\d+(?:[.,]\d+)?)\s*(л(?:\s|$|,)|литр)/); if (m) return Math.round(parseFloat(m[1].replace(',','.'))*1000);
+    if (/полтора литра/.test(s)) return 1500;
+    if (/пол\s*-?\s*литра|поллитра/.test(s)) return 500;
+    if (/литр/.test(s)) return 1000;
+    m = s.match(/(\d+|один|одну|два|две|три|четыре|пять)\s*(стакан|бутыл|кружк|чашк)/);
+    if (m){ const n = /^\d+$/.test(m[1]) ? +m[1] : WORDNUM[m[1]]; return n * (/бутыл/.test(m[2]) ? 500 : 250); }
+    if (/бутылк/.test(s)) return 500;
+    if (/стакан|кружк|чашк/.test(s)) return 250;
+    return null;
+  }
+  function spendCat(s){
+    if (/еда|обед|ужин|завтрак|кофе|продукт|перекус|ресторан|кафе|доставк|шаурм|пицц|бургер|столов|магнит|пятерочк|вкусвилл/.test(s)) return 'Еда';
+    if (/такси|метро|автобус|транспорт|бензин|каршеринг|самокат|электричк|поезд/.test(s)) return 'Транспорт';
+    if (/аренд|квартир|коммунал|общаг|жиль|интернет|связь|телефон/.test(s)) return 'Жильё';
+    if (/корт|(^|\s)зал|абонемент|спорт|трениров|бассейн|экипировк|кроссовк|лыж/.test(s)) return 'Спорт';
+    if (/книг|курс|учеб|тетрад|канцеляр|печать|распечат/.test(s)) return 'Учёба';
+    if (/кино|(^|\s)бар|клуб|игр|концерт|подписк|театр|боулинг/.test(s)) return 'Развлечения';
+    if (/купил|одежд|техник|наушник|магазин|маркетплейс|озон|(^|\s)вб(\s|$)|wildberries/.test(s)) return 'Покупки';
+    return 'Другое';
+  }
+  function parseFood(s){
+    let t = s, p='', fa='', c='';
+    const num = x => parseFloat(x.replace(',','.'));
+    const m = t.match(/бжу\s*:?\s*(\d+(?:[.,]\d+)?)\s*[\/\s,]\s*(\d+(?:[.,]\d+)?)\s*[\/\s,]\s*(\d+(?:[.,]\d+)?)/);
+    if (m){ p = num(m[1]); fa = num(m[2]); c = num(m[3]); t = t.replace(m[0],' '); }
+    const take = re => { const mm = t.match(re); if (mm){ t = t.replace(mm[0],' '); return num(mm[1]||mm[2]); } return ''; };
+    if (p==='') p = take(/(?:(?:^|\s)(?:б|белк\S*|белок)\s*:?\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*(?:г|гр)?\s*(?:белк\S*|белок)(?=\s|$))/);
+    if (fa==='') fa = take(/(?:(?:^|\s)(?:ж|жир\S*)\s*:?\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*(?:г|гр)?\s*жир\S*)/);
+    if (c==='') c = take(/(?:(?:^|\s)(?:у|углевод\S*)\s*:?\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*(?:г|гр)?\s*углевод\S*)/);
+    const kcal = take(/(\d+(?:[.,]\d+)?)\s*(?:ккал|кал\S*|kcal)/);
+    const g = take(/(\d+(?:[.,]\d+)?)\s*(?:г|гр|грамм\S*)(?=\s|$|,)/);
+    return { name: cleanFoodName(t), g, kcal, p, f:fa, c };
+  }
+  function cleanFoodName(s){
+    let n = s.replace(/(^|\s)(я|съел|поел|ел|завтракал|обедал|ужинал|перекусил|скушал|сорвался|сегодня|вчера|на завтрак|на обед|на ужин|на перекус|бжу|и все|всего)(?=\s|$)/g,' ')
+      .replace(/\s+/g,' ').trim().replace(/^[,.\-:]+|[,.\-:]+$/g,'').trim();
+    // винительный падеж первого слова: «курицу» → «курица», «гречку» → «гречка»
+    n = n.replace(/^([а-я]{2,}[бвгджзклмнпрстфхцчшщ])у(?=\s|$)/, '$1а').replace(/^([а-я]{3,})ю(?=\s|$)/, '$1я');
+    return cap(n);
+  }
+
+  function addTasks(s, day){
+    const repAll = parseRepeat(s);
+    const catAll = parseCat(s);
+    const noRemind = /без напоминан/.test(s);
+    const chunks = s.split(/;|\.\s|\s+потом\s+|\s+затем\s+|\s+после этого\s+|\s+а также\s+|\s+и еще\s+|\s+а после\s+|,\s*(?=(?:\S+\s+){0,3}?(?:в|к|с|со)\s+\d)|,\s+(?=(?:завтра|сегодня|послезавтра|утром|вечером|днем)\s)/).map(x=>x.trim()).filter(Boolean);
+    const created = [];
+    for (const p0 of chunks){
+      const p = ' '+p0+' ';
+      if (/^\s*напомн/.test(p)) continue;
+      const tr = parseTimeRange(p);
+      const title = cleanTitle(p);
+      if (!title || title.length < 2) continue;
+      const rep = parseRepeat(p) || (parseDay(p) ? null : repAll);
+      const cat = parseCat(p) || catAll || guessCat(p);
+      const dur = (tr && tr.dur) || parseDur(p) || parseDur(s) || (/пар[аыу]|лекци|семинар/.test(p) ? 90 : 60);
+      const time = tr ? tr.time : '';
+      const part = time ? partOf(time) : (parsePart(p) || parsePart(s) || 'День');
+      const base = { title, time, dur, part, cat, remind: !!time && !noRemind };
+      if (rep && rep.length){ const r = { id:uid(), from:todayKey(), days:rep, ...base }; state.routines.push(r); created.push({...r, pinned:true}); }
+      else { const d = parseDay(p) || day; const t = { id:uid(), date:d, done:false, ...base }; state.tasks.push(t); created.push(t); }
+    }
+    if (!created.length) return { text:'Не понял. Напиши «что ты умеешь», и я покажу примеры.' };
+    save();
+    const one = created.filter(c=>!c.pinned);
+    if (one.length) sel = one[0].date;
+    const n = created.length, word = plural(n,'задачу','задачи','задач');
+    const pinned = created.filter(c=>c.pinned);
+    let txt;
+    if (pinned.length === n){
+      const ds = pinned[0].days, sd = [...ds].sort().join();
+      const rs = ds.length===7 ? 'каждый день' : sd==='1,2,3,4,5' ? 'по будням' : sd==='0,6' ? 'по выходным' : 'по дням: ' + WD.filter((_,i)=>ds.includes(WD_JS[i])).join(', ');
+      txt = `Закрепил ${n} ${word}, ${rs}.`;
+    } else if (!pinned.length){
+      const dates = [...new Set(one.map(c=>c.date))];
+      txt = `Добавил ${n} ${word} на ${dates.map(d=>dayLabel(d,false)).join(' и ')}.`;
+    } else txt = `Добавил ${n} ${word}, из них закреплено ${pinned.length}.`;
+    if (created.some(c=>c.time && c.remind)) txt += ' Напомню за 60, 30 и 15 минут.';
+    return { text: txt, list: created.map(c=>({l: c.time || c.part, t: c.title + (c.time ? `, ${fmtDur(c.dur)}` : '') })) };
+  }
+
+  // ---------- чат ----------
+  function renderChat(){
+    $('chat').innerHTML = state.chat.map(m => {
+      if (m.who==='me') return m.img ? `<div class="msg me photo"><img src="${m.img}" alt="Фото"></div>` : `<div class="msg me">${esc(m.text)}</div>`;
+      const list = m.list && m.list.length ? `<div class="added">${m.list.map(t=>`<div><span>${esc(t.l ?? '—')}</span>${esc(t.t ?? '')}</div>`).join('')}</div>` : '';
+      return `<div class="msg bot">${esc(m.text)}${list}</div>`;
+    }).join('');
+    $('hints').style.display = state.chat.length ? 'none' : '';
+    requestAnimationFrame(()=>{ $('screen').scrollTop = $('screen').scrollHeight; });
+  }
+  function pushChat(...msgs){
+    state.chat.push(...msgs);
+    if (state.chat.length > 80) state.chat = state.chat.slice(-80);
+    save(); renderChat(); renderAll();
+  }
+  function send(text){
+    text = (text||'').trim(); if (!text) return;
+    let r;
+    try { r = assistant(text); } catch(e){ console.error(e); r = { text:'Что-то пошло не так. Попробуй сказать по-другому.' }; }
+    pushChat({who:'me', text}, {who:'bot', text:r.text, list:r.list||[]});
+  }
+  window.__lifeAssistant = t => { const r = assistant(t); renderAll(); return r; };
+  window.__lifeState = () => state;
+  $('send').onclick = () => { send($('input').value); $('input').value=''; autosize(); };
+  $('input').addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $('send').click(); } });
+  function autosize(){ const i=$('input'); i.style.height='auto'; i.style.height=Math.min(i.scrollHeight,110)+'px'; }
+  $('input').addEventListener('input', autosize);
+  $('hints').onclick = e => { const b = e.target.closest('.hint'); if (b) send(b.textContent); };
+
+  // ---------- онлайн / офлайн ----------
+  const isOnline = () => navigator.onLine !== false;
+  function renderNet(){
+    const on = isOnline();
+    $('netChip').classList.toggle('off', !on);
+    const ai = !!(state.settings && state.settings.aiReady);
+    $('netChip').innerHTML = !on ? '<i></i><span><b>Офлайн-режим</b> · понимаю основные команды</span>'
+      : ai ? '<i></i><span><b>ИИ-режим</b> · понимаю любые фразы</span>'
+      : '<i></i><span><b>Базовый режим</b> · ИИ подключим следующим шагом</span>';
+  }
+  window.addEventListener('online', () => { renderNet(); notify('Интернет появился. Ассистент снова в ИИ-режиме.'); });
+  window.addEventListener('offline', () => { renderNet(); notify('Нет интернета. Ассистент перешёл в офлайн-режим, всё остальное работает как обычно.'); });
+  renderNet();
+
+  $('photoBtn').onclick = () => $('photoInput').click();
+  $('photoInput').onchange = e => {
+    const file = e.target.files[0]; e.target.value = '';
+    if (!file) return;
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, 520/Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = img.width*scale; c.height = img.height*scale;
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url);
+      pushChat({who:'me', img:c.toDataURL('image/jpeg',.7)}, {who:'bot', text: isOnline()
+        ? 'Фото получил. Читать фото будет ИИ в приложении на iPhone: он сам закрепит пары по дням недели. А пока скинь это фото Claude в чат, и он внесёт расписание сюда.'
+        : 'Сейчас нет интернета, а фото разбирает ИИ. Отправь фото ещё раз, когда появится сеть.'});
+    };
+    img.onerror = () => notify('Не получилось открыть фото.');
+    img.src = url;
+  };
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, recOn = false;
+  let nFinal = '';
+  window.__speech = {
+    onStart(){ recOn = true; nFinal = ''; $('mic').classList.add('rec'); $('input').placeholder = 'Говори…'; },
+    onResult(text, isFinal){ $('input').value = text; autosize(); if (isFinal) nFinal = text; },
+    onEnd(){ recOn = false; $('mic').classList.remove('rec'); $('input').placeholder = 'Напиши или скажи'; if ($('input').value.trim()) $('send').click(); },
+    onError(code){ recOn = false; $('mic').classList.remove('rec'); $('input').placeholder = 'Напиши или скажи';
+      if (code==='not-allowed' || code==='service-not-allowed') notify('Разреши микрофон и распознавание речи: Настройки → Life of CEO.');
+      else if (code!=='no-speech' && code!=='aborted') notify('Не получилось распознать речь. Попробуй ещё раз.'); },
+  };
+  $('mic').onclick = () => {
+    if (NATIVE){ haptic('light'); post({type: recOn ? 'speechStop' : 'speechStart'}); return; }
+    if (!SR){ notify('В этом браузере нет распознавания речи. Открой файл в Chrome.'); return; }
+    if (recOn){ rec && rec.stop(); return; }
+    rec = new SR(); rec.lang = 'ru-RU'; rec.interimResults = true; rec.continuous = false;
+    let finalText = '';
+    rec.onstart = () => { recOn = true; $('mic').classList.add('rec'); $('input').placeholder = 'Говори…'; };
+    rec.onresult = ev => { let interim = ''; for (let i=ev.resultIndex;i<ev.results.length;i++){ if (ev.results[i].isFinal) finalText += ev.results[i][0].transcript; else interim += ev.results[i][0].transcript; } $('input').value = finalText + interim; autosize(); };
+    rec.onerror = ev => { if (ev.error==='not-allowed') notify('Разреши доступ к микрофону в браузере.'); };
+    rec.onend = () => { recOn = false; $('mic').classList.remove('rec'); $('input').placeholder = 'Напиши или скажи'; if ($('input').value.trim()) $('send').click(); };
+    try { rec.start(); } catch(e){ notify('Не получилось включить микрофон.'); }
+  };
+
+  // ---------- вкладки ----------
+  $('fab').onclick = () => view==='money' ? openMoney() : openTask(null);
+  document.querySelector('.tabbar').addEventListener('click', e => {
+    const b = e.target.closest('.tab'); if (!b) return;
+    view = b.dataset.view;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t===b));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id==='v-'+view));
+    $('fab').style.display = (view==='day' || view==='money') ? '' : 'none';
+    $('composer').classList.toggle('on', view==='ai');
+    $('screen').style.paddingBottom = view==='ai' ? '170px' : '';
+    if (view==='stats') renderStats();
+    if (view==='health') renderHealth();
+    if (view==='money') renderMoney();
+    if (view==='ai') renderChat();
+    $('screen').scrollTop = view==='ai' ? $('screen').scrollHeight : 0;
+  });
+
+  // ---------- резервная копия ----------
+  $('backupBtn').onclick = () => {
+    const json = JSON.stringify({app:'life-of-ceo', version:1, savedAt:new Date().toISOString(), state});
+    if (NATIVE) post({type:'backup', data: json, name:`life-of-ceo-${todayKey()}.json`});
+    else { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download = `life-of-ceo-${todayKey()}.json`; a.click(); }
+  };
+  $('restoreBtn').onclick = () => {
+    if (NATIVE) post({type:'restore'});
+    else { const i = document.createElement('input'); i.type='file'; i.accept='application/json,.json'; i.onchange = () => i.files[0] && i.files[0].text().then(window.__restore); i.click(); }
+  };
+  window.__restore = txt => {
+    try {
+      const obj = JSON.parse(txt), st = obj && obj.state ? obj.state : obj;
+      if (!st || !st.settings || !Array.isArray(st.tasks)) throw new Error('bad');
+      state = st; state.reflect ||= {}; save(); closeSheet(); sel = todayKey(); renderAll();
+      notify('Данные восстановлены из копии.');
+    } catch(e){ notify('Это не файл резервной копии Life of CEO.'); }
+  };
+  window.__notify = notify;
+  window.__onForeground = () => { renderAll(); checkMonthly(); checkReminders(); scheduleSync(); };
+  window.__openReflect = () => { closeSheet(); openReflect(reflectDayKey()); };
+
+  // ---------- системные уведомления: план на ближайшие дни ----------
+  let schedTimer = null;
+  function scheduleSync(){ if (!NATIVE) return; clearTimeout(schedTimer); schedTimer = setTimeout(doScheduleSync, 1200); }
+  function atOf(k, min){ const d = fromKey(k); d.setHours(0, min, 0, 0); return d.getTime(); }
+  function buildSchedule(){
+    const out = [], now = Date.now(), t = todayKey();
+    for (let i=0;i<3;i++){
+      const k = shiftKey(t,i);
+      for (const it of timed(k)){
+        if (it.done || !it.remind) continue;
+        const start = toMin(it.time);
+        for (const off of REMIND_OFFS) out.push({ at: atOf(k, start-off), title: `Через ${fmtDur(off)}`, body: `${it.title} в ${it.time}` });
+      }
+      // свободные окна от 30 минут, только сегодня и завтра
+      if (i < 2) for (const [a,b] of freeWindows(k)){
+        if (b-a < 30) continue;
+        const next = timed(k).find(x => toMin(x.time) >= b);
+        out.push({ at: atOf(k, a), title: 'Свободное окно', body: `${fmtDur(b-a)}${next ? ` до «${next.title}»` : ' до отбоя'}.` });
+      }
+      // рефлексия за 5 минут до сна
+      if (!state.reflect[k]) out.push({ at: atOf(k, sleepAbs()-5), title: 'Рефлексия', body: '5 минут до сна. Оцени день и запиши рефлексию.', action:'reflect' });
+      // сахар в 21:00
+      if (!state.sugar[k]) out.push({ at: atOf(k, SUGAR_NUDGE), title: 'Без сахара', body: `Сегодня был без сахара? Отметь в «Здоровье». Серия: ${days(sugarStreak())}.` });
+    }
+    // отчёт по тратам 1-го числа в 00:01
+    const n = new Date(), first = new Date(n.getFullYear(), n.getMonth()+1, 1, 0, 1, 0, 0);
+    out.push({ at: first.getTime(), title: 'Отчёт по тратам', body: `Готов отчёт за ${MONTHS[n.getMonth()]}. Открой ассистента.` });
+    return out.filter(x => x.at > now + 30000).sort((a,b)=>a.at-b.at).slice(0, 60);
+  }
+  function doScheduleSync(){ post({type:'schedule', items: buildSchedule()}); }
+
+  const tick = () => { const n = new Date(); $('sbtime').textContent = `${n.getHours()}:${pad(n.getMinutes())}`; };
+  tick(); setInterval(tick, 15000);
+  renderAll();
+  setTimeout(()=>{ checkMonthly(); checkReminders(); scheduleSync(); }, 1200);
+
+  // клавиатура: поднимаем поле ввода и шторки над ней
+  if (window.visualViewport){
+    const vv = window.visualViewport;
+    const onVV = () => {
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty('--kb', kb + 'px');
+      document.body.classList.toggle('kb', kb > 80);
+      if (kb > 80) window.scrollTo(0,0);
+    };
+    vv.addEventListener('resize', onVV); vv.addEventListener('scroll', onVV);
+  }
+  post({type:'ready'});
+})();
+</script>
+</body>
+</html>

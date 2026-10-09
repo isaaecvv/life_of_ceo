@@ -1,25 +1,51 @@
 {
   "expo": {
-    "name": "tracker",
-    "slug": "tracker",
+    "name": "Life of CEO",
+    "slug": "life-of-ceo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#000000",
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.isaaecvv.lifeofceo",
+      "buildNumber": "1",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent",
+        "NSCameraUsageDescription": "Камера нужна, чтобы сфотографировать расписание, еду или чек для ассистента.",
+        "NSPhotoLibraryUsageDescription": "Доступ к фото нужен, чтобы отправить ассистенту снимок расписания, еды или чека.",
+        "NSMicrophoneUsageDescription": "Микрофон нужен, чтобы давать ассистенту команды голосом.",
+        "NSSpeechRecognitionUsageDescription": "Распознавание речи превращает твои голосовые команды в текст."
+      }
     },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    "plugins": [
+      "./plugins/withoutPushEntitlement",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000000",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 96
+        }
+      ],
+      "expo-notifications",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Микрофон нужен, чтобы давать ассистенту команды голосом.",
+          "speechRecognitionPermission": "Распознавание речи превращает твои голосовые команды в текст."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "16.4"
+          }
+        }
+      ]
+    ]
   }
 }

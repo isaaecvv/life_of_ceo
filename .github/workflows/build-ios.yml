@@ -1,0 +1,82 @@
+name: Сборка iPhone-приложения
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-build
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Выбрать свежий Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          echo "Xcode: $XCODE"
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+
+      - name: Зависимости
+        run: npm ci
+
+      - name: Интерфейс
+        run: node scripts/build-web.mjs
+
+      - name: Нативный проект
+        run: npx expo prebuild --platform ios --clean --no-install
+        env:
+          CI: 1
+
+      - name: CocoaPods
+        working-directory: ios
+        run: pod install
+
+      - name: Сборка без подписи
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/LifeofCEO.xcworkspace \
+            -scheme LifeofCEO \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tail -200
+
+      - name: Упаковать .ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/LifeofCEO.app Payload/
+          zip -qry LifeOfCEO.ipa Payload
+          ls -lh LifeOfCEO.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LifeOfCEO-ipa
+          path: LifeOfCEO.ipa
+          retention-days: 30
+
+      - name: Выложить в Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Life of CEO — сборка ${{ github.run_number }}
+          body: Скачай LifeOfCEO.ipa на iPhone и открой через SideStore (плюс сверху → выбрать файл).
+          files: LifeOfCEO.ipa
+          make_latest: true
