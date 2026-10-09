@@ -1963,7 +1963,14 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       .then(async r => ({ok:r.ok, status:r.status, text: await r.text()}))
       .catch(e => ({ok:false, status:0, text:String(e)}));
   }
+  function serverMsg(r){
+    try { const j = JSON.parse(r.text); const m = (j.error && (j.error.message || j.error)) || j.message || j.detail; return typeof m === 'string' ? m.slice(0,160) : ''; } catch(e){ return String(r.text||'').slice(0,160); }
+  }
   function httpError(r){
+    const base = httpErrorBase(r), m = r.status ? serverMsg(r) : '';
+    return m ? `${base}: ${m}` : base;
+  }
+  function httpErrorBase(r){
     if (r.status===0) return r.text==='timeout' ? 'нет ответа' : 'нет связи';
     if (r.status===401 || r.status===403) return 'неверный ключ или нет доступа';
     if (r.status===404) return 'не найдена модель или адрес';
