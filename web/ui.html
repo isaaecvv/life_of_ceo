@@ -1068,7 +1068,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       if (ed && ed.kind==='task') Object.assign(ed.ref, data, {date});
       else {
         if (ed) state.routines = state.routines.filter(x=>x.id!==ed.id);
-        state.tasks.push({ id:uid(), done:false, date, ...data });
+        state.tasks.push({ id:uid(), done:false, createdAt:Date.now(), date, ...data });
       }
       sel = date;
     } else {
@@ -1637,7 +1637,15 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
         state.tasks = state.tasks.filter(t=>t.date!==day); save(); sel = day;
         return { text: n ? `Удалил ${n} ${plural(n,'дело','дела','дел')} на ${dayLabel(day,false)}. Закреплённые остались.` : `На ${dayLabel(day,false)} разовых дел нет.` };
       }
-      const q = stripAll(s.replace(/(^|\s)(удали|удалить|убери|убрать|отмени|отменить|вычеркни|сотри|снеси)(?=\s|$)/g,' ').replace(/только/g,' ').replace(/закрепленн\S*|повторяющ\S*/g,' '));
+      if (/(последн\S*|котор\S* (я )?(только что )?добавил|до этого|(^|\s)(ее|её|эту|это)(\s|$))/.test(s) && !/(трат|расход|ед[уыа]|вод)/.test(s)){
+        const lastT = state.tasks[state.tasks.length-1], lastR = state.routines[state.routines.length-1];
+        const lt = lastT ? parseInt(lastT.id,36) : -1;
+        const pickT = state.tasks.length ? state.tasks.reduce((a,b)=> (b.createdAt||0) >= (a.createdAt||0) ? b : a) : null;
+        const t = pickT || lastT;
+        if (t){ state.tasks = state.tasks.filter(x=>x.id!==t.id); save(); sel = t.date; return { text:`Удалил последнюю добавленную задачу «${t.title}»${t.time ? ' в '+t.time : ''} на ${dayLabel(t.date,false)}.` }; }
+        return { text:'Разовых задач нет. Закреплённую удали по названию, например «удали зарядку».' };
+      }
+      const q = stripAll(s.replace(/(^|\s)(удали|удалить|убери|убрать|отмени|отменить|вычеркни|сотри|снеси)(?=\s|$)/g,' ').replace(/только/g,' ').replace(/закрепленн\S*|повторяющ\S*/g,' ').replace(/(^|\s)(пожалуйста|задачу|задача|дело)(?=\s|$)/g,' '));
       const pd = parseDay(s);
       const found = findTarget(q, pd);
       if (!found) return { text:`Не нашёл задачу «${q.trim()}». Проверь название.` };
@@ -1853,7 +1861,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       const part = time ? partOf(time) : (parsePart(p) || parsePart(s) || 'День');
       const base = { title, time, dur, part, cat, remind: !!time && !noRemind };
       if (rep && rep.length){ const r = { id:uid(), from:todayKey(), days:rep, ...base }; state.routines.push(r); created.push({...r, pinned:true}); }
-      else { const d = parseDay(p) || day; const t = { id:uid(), date:d, done:false, ...base }; state.tasks.push(t); created.push(t); }
+      else { const d = parseDay(p) || day; const t = { id:uid(), date:d, done:false, createdAt:Date.now(), ...base }; state.tasks.push(t); created.push(t); }
     }
     if (!created.length) return { text:'Не понял. Напиши «что ты умеешь», и я покажу примеры.' };
     save();
@@ -2050,13 +2058,17 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   }
 
   async function askAI(text, imageData){
-    const history = state.chat.slice(-9, -1).filter(m => m.text && !m.img).map(m => ({ role: m.who==='me' ? 'user' : 'assistant', content: m.text }));
+    const raw = state.chat.slice(-11, -1).filter(m => m.text && !m.img).map(m => ({ role: m.who==='me' ? 'user' : 'assistant', content: m.text }));
+    // модели вроде Qwen требуют: один system в начале, дальше user/assistant по очереди, первым user
+    const history = [];
+    for (const m of raw){ const last = history[history.length-1]; if (last && last.role===m.role) last.content += '\n' + m.content; else history.push({...m}); }
+    while (history.length && history[0].role !== 'user') history.shift();
+    if (history.length && history[history.length-1].role === 'user') history.pop();
     const userContent = imageData
       ? [ { type:'text', text: text || 'Разбери это фото и внеси в приложение то, что на нём.' }, { type:'image_url', image_url:{ url: imageData } } ]
       : text;
     const messages = [
-      { role:'system', content: AI_SYSTEM },
-      { role:'system', content: 'CONTEXT ' + JSON.stringify(aiContext()) },
+      { role:'system', content: AI_SYSTEM + '\n\nCONTEXT ' + JSON.stringify(aiContext()) },
       ...history,
       { role:'user', content: userContent },
     ];
@@ -2095,7 +2107,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
             const base = { title, time, dur, part: time ? partOf(time) : pick(a.part, PARTS, 'День'), cat: pick(a.cat, CATS, guessCat(title.toLowerCase())), remind: time ? a.remind !== false : false };
             const days = Array.isArray(a.repeat_days) ? [...new Set(a.repeat_days.map(Number).filter(n=>n>=0&&n<=6))] : [];
             if (days.length){ state.routines.push({ id:uid(), from:T, days, ...base }); log.push({l: time || base.part, t:`${title} · закреплено`}); }
-            else { state.tasks.push({ id:uid(), date, done:false, ...base }); log.push({l: time || base.part, t:`${title} · ${dayLabel(date,false)}`}); sel = date; }
+            else { state.tasks.push({ id:uid(), date, done:false, createdAt:Date.now(), ...base }); log.push({l: time || base.part, t:`${title} · ${dayLabel(date,false)}`}); sel = date; }
             break;
           }
           case 'update_task': {
@@ -2169,7 +2181,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     readAIForm(); save(); renderNet();
     if (!aiReady()){ setAIStat('bad', 'Заполни все поля'); return; }
     setAIStat('', 'Проверяю…');
-    const r = await httpPost(aiRequest([{ role:'system', content:'Ответь строго JSON: {"reply":"ok","actions":[]}' }, { role:'user', content:'проверка' }]));
+    const r = await httpPost(aiRequest([{ role:'system', content:'Ответь строго JSON: {"reply":"ok","actions":[]}' }, { role:'user', content:'проверка связи' }]));
     if (r.ok) setAIStat('ok', 'Работает'); else setAIStat('bad', 'Не работает: ' + httpError(r));
   };
 
