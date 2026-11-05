@@ -246,6 +246,10 @@ export default function App() {
         domStorageEnabled
         scrollEnabled={false}
         bounces={false}
+        overScrollMode="never"
+        directionalLockEnabled
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentInsetAdjustmentBehavior="never"
         automaticallyAdjustContentInsets={false}
         keyboardDisplayRequiresUserAction={false}

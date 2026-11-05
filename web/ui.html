@@ -247,6 +247,14 @@ input,textarea{font:inherit;color:inherit}
 .rate{display:grid;grid-template-columns:repeat(10,1fr);gap:4px}
 .rate button{height:44px;border-radius:12px;background:var(--raise2);font-weight:700;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
 .rate button.on{background:var(--accent);color:#fff}
+.rrow{margin-top:12px}
+.rrow .rl{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:6px}
+.rrow .rl span{color:var(--accent);font-variant-numeric:tabular-nums}
+.rate.sm button{height:34px;border-radius:10px;font-size:13px}
+.refparts{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.refparts div{background:var(--raise2);border-radius:12px;padding:8px 2px;text-align:center}
+.refparts b{display:block;font-family:var(--display);font-size:16px}
+.refparts span{font-size:11px;color:var(--muted);font-weight:600}
 .rate-cap{display:flex;justify-content:space-between;font-size:12px;color:var(--faint);font-weight:600;margin-top:6px}
 textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 .refl{background:var(--raise);border-radius:22px;padding:16px;margin-top:4px;text-align:left;width:100%;display:block}
@@ -378,8 +386,17 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 .msg.bot.typing span:nth-child(2){animation-delay:.2s}
 .msg.bot.typing span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.pend{position:absolute;left:0;bottom:calc(100% + 8px);display:none;align-items:center;gap:10px;background:var(--raise);border:1px solid var(--line);border-radius:16px;padding:6px 10px 6px 6px}
+.pend.on{display:flex}
+.pend img{width:52px;height:52px;object-fit:cover;border-radius:11px}
+.pend span{font-size:13px;color:var(--muted);font-weight:600}
+.pend button{width:28px;height:28px;border-radius:50%;background:var(--raise2);display:grid;place-items:center;color:var(--muted)}
+.pend button svg{width:14px;height:14px}
 .msg .via{display:block;font-size:12px;color:var(--faint);margin-top:6px}
 .backup .btn{height:48px;font-size:15px}
+@media (max-width:519px){ .phone{position:fixed;inset:0;height:auto} }
+.screen{touch-action:pan-y;overscroll-behavior-x:none}
+.phone{touch-action:manipulation}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -548,7 +565,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 
     <section class="view" id="v-money">
       <div class="brand">Life of CEO</div>
-      <div class="seg2" id="mPeriod"><button data-p="day">День</button><button data-p="week">Неделя</button><button data-p="month" class="on">Месяц</button></div>
+      <div class="seg2" id="mPeriod"><button data-p="day" class="on">День</button><button data-p="week">Неделя</button><button data-p="month">Месяц</button></div>
       <div class="daynav"><b id="mTitleP"></b><div class="arrs">
         <button data-mshift="-1" aria-label="Назад"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
         <button data-mshift="1" aria-label="Вперёд"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
@@ -586,6 +603,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>
     </button>
     <input type="file" id="photoInput" accept="image/*" class="hide">
+    <div class="pend" id="pend"><img id="pendImg" alt="Фото к отправке"><span>Подпиши фото и отправь</span><button id="pendX" aria-label="Убрать фото"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
     <textarea id="input" rows="1" placeholder="Напиши или скажи"></textarea>
     <button class="round" id="mic" aria-label="Сказать голосом">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4"/></svg>
@@ -661,9 +679,8 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     <div class="grab"></div>
     <h2 id="rsTitle">Как прошёл день?</h2>
     <p class="note" id="refDate" style="margin:-8px 0 4px"></p>
-    <div class="lbl">Оценка дня</div>
-    <div class="rate" id="refRate"></div>
-    <div class="rate-cap"><span>плохо</span><span>отлично</span></div>
+    <div class="lbl">Оцени каждый раздел от 1 до 10</div>
+    <div id="refRows"></div>
     <div class="lbl">Саморефлексия</div>
     <textarea class="field" id="refText" maxlength="1500" placeholder="Что получилось, что нет, что завтра сделать лучше"></textarea>
     <div class="sheetbtns"><button class="btn" id="refSave">Сохранить</button></div>
@@ -684,11 +701,6 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   <div class="sheet" id="setSheet" role="dialog" aria-modal="true" aria-labelledby="ssTitle">
     <div class="grab"></div>
     <h2 id="ssTitle">Настройки</h2>
-    <div class="gc">
-      <div class="gi">G</div>
-      <div class="gt2"><b>Google Календарь</b><span>Не подключён</span></div>
-      <button id="gcBtn">Подключить</button>
-    </div>
     <div id="signBox" class="hide"><div class="lbl">Установка</div><div class="aibox" id="signInfo" style="font-size:14px;line-height:1.45"></div></div>
     <div class="lbl">ИИ-ассистент</div>
     <div class="aibox">
@@ -1030,7 +1042,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     $('reflectWrap').classList.toggle('hide', sel > todayKey());
     $('reflectTime').textContent = sel===todayKey() && !r ? `откроется в ${fromMin(toMin(state.settings.sleep)-5)}` : '';
     $('reflectCard').innerHTML = r
-      ? `<button class="refl" id="reflOpen"><div class="rt"><span class="score num">${r.score}<small> / 10</small></span></div>${r.text ? `<p>${esc(r.text)}</p>` : ''}</button>`
+      ? `<button class="refl" id="reflOpen"><div class="rt"><span class="score num">${fmtNum(r.score,1)}<small> / 10 в среднем</small></span></div>${partsHtml(r)}${r.text ? `<p>${esc(r.text)}</p>` : ''}</button>`
       : `<button class="refl" id="reflOpen"><div class="ask"><span>${sel===todayKey() ? 'Оцени день и запиши мысли' : 'Рефлексия не заполнена'}</span><b>Заполнить</b></div></button>`;
     $('reflOpen').onclick = () => openReflect(sel);
   }
@@ -1176,7 +1188,6 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     pills('setSleepGoal', [7,7.5,8,9].map(n=>[n, fmtNum(n,1)+' ч']), state.settings.sleepGoal, 'sg');
   }
   $('gear').onclick = () => { renderSettings(); renderAISettings(); openSheet($('setSheet')); };
-  $('gcBtn').onclick = () => notify('Google Календарь подключим следующим шагом, вместе с ИИ.');
   $('setWake').onchange = e => { state.settings.wake = e.target.value || '08:00'; save(); renderAll(); };
   $('setSleep').onchange = e => { state.settings.sleep = e.target.value || '23:30'; save(); renderAll(); };
   $('setWater').onclick = e => { const b = e.target.closest('[data-w]'); if (b){ state.settings.waterL = +b.dataset.w; save(); renderSettings(); } };
@@ -1317,7 +1328,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   };
 
   // ---------- экран «Траты» ----------
-  let mPeriod = 'month', mAnchor = todayKey(), mCat = 'Еда';
+  let mPeriod = 'day', mAnchor = todayKey(), mCat = 'Еда';
   function mRange(){
     const a = fromKey(mAnchor);
     if (mPeriod==='day') return [mAnchor];
@@ -1402,25 +1413,33 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     const rk = weekKs.filter(k => state.reflect[k]);
     const avg = rk.length ? rk.reduce((a,k)=>a+state.reflect[k].score,0)/rk.length : 0;
     $('refWeek').innerHTML = `<div class="ch"><b>Оценки дней</b><span>${rk.length ? 'в среднем '+fmtNum(avg,1)+' из 10' : ''}</span></div>` +
-      (rk.length ? `<div class="rlist">${[...rk].reverse().map(k=>`<div class="ri"><div class="rh">${cap(dayLabel(k,false))}, ${WD[(fromKey(k).getDay()+6)%7].toLowerCase()}<span>${state.reflect[k].score}/10</span></div>${state.reflect[k].text ? `<p>${esc(state.reflect[k].text)}</p>` : ''}</div>`).join('')}</div>`
+      (rk.length ? `<div class="rlist">${[...rk].reverse().map(k=>`<div class="ri"><div class="rh">${cap(dayLabel(k,false))}, ${WD[(fromKey(k).getDay()+6)%7].toLowerCase()}<span>${fmtNum(state.reflect[k].score,1)}/10</span></div>${state.reflect[k].parts ? `<p>${REF_PARTS.filter(([id])=>state.reflect[k].parts[id]).map(([id,l])=>`${l} ${state.reflect[k].parts[id]}`).join(' · ')}</p>` : ''}${state.reflect[k].text ? `<p>${esc(state.reflect[k].text)}</p>` : ''}</div>`).join('')}</div>`
         : `<div class="note" style="margin:0">Оценки появятся после первой вечерней рефлексии.</div>`);
   }
 
   // ---------- рефлексия ----------
-  let refKey = null, refScore = 0;
-  function renderRate(){ $('refRate').innerHTML = [...Array(10)].map((_,i)=>`<button class="${refScore===i+1?'on':''}" data-r="${i+1}" aria-label="Оценка ${i+1}">${i+1}</button>`).join(''); }
-  $('refRate').onclick = e => { const b = e.target.closest('[data-r]'); if (b){ refScore = +b.dataset.r; renderRate(); } };
+  const REF_PARTS = [['gym','Зал'],['food','Питание'],['sleep','Сон'],['tasks','Задачи'],['spend','Траты']];
+  let refKey = null, refParts = {};
+  const avgParts = p => { const v = Object.values(p||{}).filter(x=>x>=1); return v.length ? Math.round(v.reduce((a,b)=>a+b,0)/v.length*10)/10 : 0; };
+  function renderRate(){
+    $('refRows').innerHTML = REF_PARTS.map(([id,l]) => `<div class="rrow"><div class="rl">${l}<span>${refParts[id] ? refParts[id]+'/10' : ''}</span></div><div class="rate sm">${[...Array(10)].map((_,i)=>`<button class="${refParts[id]===i+1?'on':''}" data-p="${id}" data-r="${i+1}" aria-label="${l}: ${i+1}">${i+1}</button>`).join('')}</div></div>`).join('');
+  }
+  $('refRows').onclick = e => { const b = e.target.closest('[data-r]'); if (!b) return; const id = b.dataset.p, v = +b.dataset.r; refParts[id] = refParts[id]===v ? 0 : v; haptic('light'); renderRate(); };
   function openReflect(k){
     refKey = k; const r = state.reflect[k];
-    refScore = r ? r.score : 0; $('refText').value = r ? r.text : '';
+    refParts = r && r.parts ? {...r.parts} : {};
+    $('refText').value = r ? (r.text||'') : '';
     $('refDate').textContent = cap(dayLabel(k,false));
     renderRate(); openSheet($('refSheet'));
   }
   $('refSave').onclick = () => {
-    if (!refScore){ notify('Поставь оценку дню от 1 до 10.'); return; }
-    state.reflect[refKey] = { score: refScore, text: $('refText').value.trim(), at: Date.now() };
-    save(); closeSheet(); renderAll(); notify(`Рефлексия сохранена: ${refScore}/10.`);
+    const parts = Object.fromEntries(Object.entries(refParts).filter(([,v])=>v>=1));
+    if (!Object.keys(parts).length){ notify('Оцени хотя бы один раздел.'); return; }
+    const score = avgParts(parts);
+    state.reflect[refKey] = { score, parts, text: $('refText').value.trim(), at: Date.now() };
+    save(); closeSheet(); renderAll(); notify(`Рефлексия сохранена, средняя оценка ${fmtNum(score,1)}/10.`);
   };
+  const partsHtml = r => r && r.parts ? `<div class="refparts">${REF_PARTS.map(([id,l])=>`<div><b>${r.parts[id] || '—'}</b><span>${l}</span></div>`).join('')}</div>` : '';
   // минуты до отбоя (с учётом отбоя после полуночи); null — если уже спим
   function sleepAbs(){ let s = toMin(state.settings.sleep), w = toMin(state.settings.wake); if (s <= w) s += 1440; return s; }
   function minutesToSleep(){
@@ -1458,6 +1477,16 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   }
   function hideToast(){ $('toast').classList.remove('on'); toastQueue.shift(); if (toastQueue.length) setTimeout(showNext, 500); }
   $('toast').onclick = () => { clearTimeout(toastTimer); hideToast(); };
+  (function(){
+    const t = $('toast'); let y0 = null, dy = 0;
+    t.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; dy = 0; t.style.transition = 'none'; clearTimeout(toastTimer); }, {passive:true});
+    t.addEventListener('touchmove', e => { if (y0===null) return; dy = Math.min(0, e.touches[0].clientY - y0); t.style.transform = `translateY(${dy}px)`; }, {passive:true});
+    t.addEventListener('touchend', () => {
+      t.style.transition = ''; t.style.transform = '';
+      if (dy < -25) hideToast(); else toastTimer = setTimeout(hideToast, 2500);
+      y0 = null;
+    });
+  })();
 
   function checkReminders(){
     const k = todayKey(), now = nowMin();
@@ -1473,7 +1502,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
         }
       }
     }
-    const w = freeWindows(k).find(([s,e]) => s<=now && now<e && e-s>=30);
+    const w = freeWindows(k).find(([s,e]) => s<=now && now<e && e-s>=30 && now-s<=10 && s>toMin(state.settings.wake));
     if (w){
       const nk = `free|${k}|${w[1]}`;
       if (!state.notified[nk]){
@@ -1705,7 +1734,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     }
     if (/рефлекси|оценк|оценил/.test(s)){
       const r = state.reflect[day];
-      return r ? { text:`${cap(dayLabel(day,false))}: ${r.score}/10.${r.text ? '\n'+r.text : ''}` } : `Рефлексия за ${dayLabel(day,false)} не заполнена.`;
+      return r ? { text:`${cap(dayLabel(day,false))}: в среднем ${fmtNum(r.score,1)}/10.${r.parts ? '\n'+REF_PARTS.filter(([id])=>r.parts[id]).map(([id,l])=>`${l} ${r.parts[id]}`).join(', ') : ''}${r.text ? '\n'+r.text : ''}` } : `Рефлексия за ${dayLabel(day,false)} не заполнена.`;
     }
     if (/свободн/.test(s)){
       const wins = freeWindows(day), tot = wins.reduce((a,[x,y])=>a+y-x,0);
@@ -2099,7 +2128,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   }
   window.__lifeAssistant = t => { const r = assistant(t); renderAll(); return r; };
   window.__lifeState = () => state;
-  $('send').onclick = () => { send($('input').value); $('input').value=''; autosize(); };
+  $('send').onclick = () => { const img = pendingImage; if (img) clearPending(); send($('input').value, img || undefined); $('input').value=''; autosize(); };
   $('input').addEventListener('keydown', e => { if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $('send').click(); } });
   function autosize(){ const i=$('input'); i.style.height='auto'; i.style.height=Math.min(i.scrollHeight,110)+'px'; }
   $('input').addEventListener('input', autosize);
@@ -2214,7 +2243,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 - {"type":"sugar","value":"clean|ate","date"?} — clean = день без сахара, ate = был сахар (серия обнуляется). Сладкая еда = ate.
 - {"type":"add_spend","amt":число,"cat":"Еда|Транспорт|Жильё|Учёба|Спорт|Развлечения|Покупки|Другое","note"?,"date"?}
 - {"type":"delete_spend","id":"..."}
-- {"type":"reflect","score":1-10,"text"?,"date"?}
+- {"type":"reflect","parts":{"gym":1-10,"food":1-10,"sleep":1-10,"tasks":1-10,"spend":1-10},"text"?,"date"?} — рефлексия: оценки по разделам Зал, Питание, Сон, Задачи, Траты (можно не все).
 - {"type":"open_reflect"}
 - {"type":"update_settings","wake"?,"sleep"?,"water_l"?,"sleep_goal_h"?}
 
@@ -2224,6 +2253,8 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 - На вопросы («сколько выпил», «сколько потратил за неделю», «что у меня завтра», «сколько свободного времени») отвечай по CONTEXT, actions пустой.
 - Фото расписания вуза: создай закреплённые задачи (repeat_days) для каждой пары с её временем и длительностью, cat «Учёба». Если чётные/нечётные недели — спроси.
 - Фото еды: оцени блюдо, вес, ккал и БЖУ, добавь add_food. Фото чека: add_spend с итоговой суммой.
+- Фото этикетки или таблицы пищевой ценности (БЖУ, ккал): прочитай значения точно. Если в подписи указан вес или порция («съел 200 г», «половину пачки») — пересчитай на этот вес; если веса нет — бери значения на порцию, а если указано только «на 100 г» — записывай на 100 г и скажи об этом в reply. Сразу добавь add_food с названием продукта с упаковки.
+- Подпись пользователя к фото важнее догадок: если он написал, что это, — используй это.
 - Доходы не записываются — только траты.
 - reply: 1–3 коротких предложения, без markdown. Не перечисляй в reply то, что уже видно в списке изменений.`;
 
@@ -2333,7 +2364,15 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
           case 'sugar': { const v = a.value==='ate' ? 'ate' : 'clean'; const msg = markSugarSet(date, v); log.push({l:'Сахар', t: msg}); break; }
           case 'add_spend': { const amt = posNum(a.amt); if (!amt) break; const cat = pick(a.cat, SPEND_CATS, 'Другое'); const note = String(a.note||'').trim().slice(0,60); state.spend.push({id:uid(), date, amt, cat, note}); log.push({l: rub(amt), t:`${note || cat}${note ? ' · '+cat : ''}`}); break; }
           case 'delete_spend': { const x = state.spend.find(s=>s.id===a.id); if (!x) break; state.spend = state.spend.filter(s=>s.id!==a.id); log.push({l: rub(x.amt), t:`${x.note||x.cat} · удалено`}); break; }
-          case 'reflect': { const sc = Math.round(+a.score); if (!(sc>=1 && sc<=10)) break; state.reflect[date] = { score:sc, text:String(a.text||'').trim().slice(0,1500), at:Date.now() }; log.push({l:`${sc}/10`, t:'Рефлексия записана'}); break; }
+          case 'reflect': {
+            const parts = {};
+            if (a.parts && typeof a.parts === 'object') for (const [id] of REF_PARTS){ const v = Math.round(+a.parts[id]); if (v>=1 && v<=10) parts[id] = v; }
+            const single = Math.round(+a.score);
+            if (!Object.keys(parts).length && !(single>=1 && single<=10)) break;
+            const score = Object.keys(parts).length ? avgParts(parts) : single;
+            state.reflect[date] = { score, parts: Object.keys(parts).length ? parts : undefined, text:String(a.text||'').trim().slice(0,1500), at:Date.now() };
+            log.push({l:`${fmtNum(score,1)}/10`, t:'Рефлексия записана'}); break;
+          }
           case 'open_reflect': setTimeout(()=>openReflect(reflectDayKey()), 300); break;
           case 'update_settings': {
             if (isTime(a.wake)) state.settings.wake = normTime(a.wake);
@@ -2387,6 +2426,9 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   window.addEventListener('offline', () => { renderNet(); notify('Нет интернета. Ассистент перешёл в офлайн-режим, всё остальное работает как обычно.'); });
   renderNet();
 
+  let pendingImage = null;
+  function clearPending(){ pendingImage = null; $('pend').classList.remove('on'); $('pendImg').removeAttribute('src'); $('input').placeholder = 'Напиши или скажи'; }
+  $('pendX').onclick = clearPending;
   $('photoBtn').onclick = () => $('photoInput').click();
   $('photoInput').onchange = e => {
     const file = e.target.files[0]; e.target.value = '';
@@ -2396,8 +2438,10 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       const shot = (max, q) => { const sc = Math.min(1, max/Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc); c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c.toDataURL('image/jpeg', q); };
       const image = { thumb: shot(480, .6), full: shot(1400, .82) };
       URL.revokeObjectURL(url);
-      const caption = $('input').value.trim(); $('input').value = ''; autosize();
-      send(caption, image);
+      pendingImage = image;
+      $('pendImg').src = image.thumb; $('pend').classList.add('on');
+      $('input').placeholder = 'Подпись к фото, например «это мой обед»';
+      $('input').focus();
     };
     img.onerror = () => notify('Не получилось открыть фото.');
     img.src = url;
@@ -2532,6 +2576,9 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     };
     vv.addEventListener('resize', onVV); vv.addEventListener('scroll', onVV);
   }
+  // документ целиком никогда не сдвигается — прокручивается только содержимое экрана
+  window.addEventListener('scroll', () => { if (window.scrollY || window.scrollX) window.scrollTo(0,0); }, {passive:true});
+  document.addEventListener('gesturestart', e => e.preventDefault());
   post({type:'ready'});
 })();
 </script>
