@@ -636,6 +636,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       <div class="gt2"><b>Google Календарь</b><span>Не подключён</span></div>
       <button id="gcBtn">Подключить</button>
     </div>
+    <div id="signBox" class="hide"><div class="lbl">Установка</div><div class="aibox" id="signInfo" style="font-size:14px;line-height:1.45"></div></div>
     <div class="lbl">ИИ-ассистент</div>
     <div class="aibox">
       <div class="pills" id="aiProv"></div>
@@ -2278,7 +2279,16 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     } catch(e){ notify('Это не файл резервной копии Life of CEO.'); }
   };
   window.__notify = notify;
-  window.__onForeground = () => { renderAll(); checkMonthly(); checkReminders(); scheduleSync(); };
+  function signCheck(){
+    const exp = window.__SIGN_EXPIRY__; if (!exp) return;
+    const left = exp - Date.now(), d = new Date(exp);
+    const when = `${d.getDate()} ${MONTHS_G[d.getMonth()]} в ${fromMin(d.getHours()*60+d.getMinutes())}`;
+    $('signBox').classList.remove('hide');
+    $('signInfo').innerHTML = `Подпись действует до <b>${when}</b>. Обновляй её в SideStore («Refresh All» с включённым LocalDevVPN) раньше этого времени — данные при этом сохраняются.`;
+    const k = 'sign|' + todayKey();
+    if (left < 48*3600e3 && !state.notified[k]){ state.notified[k] = true; save(); notify(`Подпись приложения истекает ${when}. Открой SideStore и нажми «Refresh All».`); }
+  }
+  window.__onForeground = () => { renderAll(); checkMonthly(); checkReminders(); scheduleSync(); signCheck(); };
   window.__openReflect = () => { closeSheet(); openReflect(reflectDayKey()); };
 
   // ---------- системные уведомления: план на ближайшие дни ----------
@@ -2305,6 +2315,12 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       // сахар в 21:00
       if (!state.sugar[k]) out.push({ at: atOf(k, SUGAR_NUDGE), title: 'Без сахара', body: `Сегодня был без сахара? Отметь в «Здоровье». Серия: ${days(sugarStreak())}.` });
     }
+    // подпись приложения: напомнить обновить SideStore
+    const exp = window.__SIGN_EXPIRY__;
+    if (exp){
+      out.push({ at: exp - 36*3600e3, title:'Обнови SideStore', body:'Через полтора дня приложение перестанет открываться. Включи LocalDevVPN и нажми в SideStore «Refresh All».' });
+      out.push({ at: exp - 6*3600e3, title:'Обнови SideStore сегодня', body:'Осталось несколько часов. Включи LocalDevVPN и нажми в SideStore «Refresh All».' });
+    }
     // отчёт по тратам 1-го числа в 00:01
     const n = new Date(), first = new Date(n.getFullYear(), n.getMonth()+1, 1, 0, 1, 0, 0);
     out.push({ at: first.getTime(), title: 'Отчёт по тратам', body: `Готов отчёт за ${MONTHS[n.getMonth()]}. Открой ассистента.` });
@@ -2315,7 +2331,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   const tick = () => { const n = new Date(); $('sbtime').textContent = `${n.getHours()}:${pad(n.getMinutes())}`; };
   tick(); setInterval(tick, 15000);
   renderAll();
-  setTimeout(()=>{ checkMonthly(); checkReminders(); scheduleSync(); }, 1200);
+  setTimeout(()=>{ checkMonthly(); checkReminders(); scheduleSync(); signCheck(); }, 1200);
 
   // клавиатура: поднимаем поле ввода и шторки над ней
   if (window.visualViewport){

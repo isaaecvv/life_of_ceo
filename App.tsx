@@ -49,6 +49,22 @@ function readSavedState(): string | null {
   }
 }
 
+// Когда истекает подпись приложения (SideStore подписывает на 7 дней).
+function readSignExpiry(): number | null {
+  try {
+    const f = new File(Paths.bundle, 'embedded.mobileprovision');
+    if (!f.exists) return null;
+    const bytes = f.bytesSync();
+    let txt = '';
+    for (let i = 0; i < bytes.length; i += 8192) txt += String.fromCharCode(...bytes.subarray(i, i + 8192));
+    const m = txt.match(/<key>ExpirationDate<\/key>\s*<date>([^<]+)<\/date>/);
+    const t = m ? Date.parse(m[1]) : NaN;
+    return isFinite(t) ? t : null;
+  } catch {
+    return null;
+  }
+}
+
 function writeState(data: string) {
   try {
     const f = stateFile();
@@ -85,9 +101,10 @@ export default function App() {
   const pendingAction = useRef<string | null>(null);
 
   const initialState = useMemo(readSavedState, []);
+  const signExpiry = useMemo(readSignExpiry, []);
   const beforeLoad = useMemo(
-    () => `window.__NATIVE__=true;window.__INITIAL_STATE__=${initialState ?? 'null'};true;`,
-    [initialState],
+    () => `window.__NATIVE__=true;window.__SIGN_EXPIRY__=${signExpiry ?? 'null'};window.__INITIAL_STATE__=${initialState ?? 'null'};true;`,
+    [initialState, signExpiry],
   );
 
   const run = useCallback((js: string) => {
