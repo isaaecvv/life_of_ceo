@@ -153,7 +153,7 @@ input,textarea{font:inherit;color:inherit}
 .fab svg{width:24px;height:24px}
 
 .tabbar{position:absolute;left:0;right:0;bottom:0;padding:10px 8px calc(4px + var(--sab));background:linear-gradient(to top,#000 70%,rgba(0,0,0,0));display:flex;justify-content:space-around;z-index:4}
-.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--faint);padding:6px 6px;min-width:62px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--faint);padding:6px 2px;min-width:52px;flex:1}
 .tab svg{width:23px;height:23px}
 .tab.on{color:var(--text)}
 
@@ -346,6 +346,24 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 .kb .composer{bottom:calc(var(--kb) + 8px)}
 .kb .sheet.on{bottom:var(--kb);max-height:calc(100% - var(--kb) - var(--sat) - 8px);padding-bottom:16px}
 .backup{display:flex;gap:10px;margin-top:8px}
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchip{padding:10px 14px;border-radius:14px;background:var(--raise2);font-size:15px;font-weight:700;color:var(--muted);display:inline-flex;align-items:center;gap:8px}
+.mchip i{width:9px;height:9px;border-radius:50%;background:var(--mc)}
+.mchip.on{background:var(--mc);color:#000}
+.mchip.on i{background:#000}
+.gcal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.gcal .wd{font-size:11px;color:var(--faint);font-weight:700;text-align:center;padding-bottom:4px}
+.gcal button{min-height:54px;border-radius:12px;background:var(--raise2);display:flex;flex-direction:column;align-items:center;padding:6px 2px 5px;gap:5px}
+.gcal button.other{background:transparent;opacity:.35}
+.gcal button .n{font-size:13px;font-weight:700;color:var(--muted)}
+.gcal button.today .n{color:var(--accent)}
+.gcal button.sel{outline:2px solid var(--text);outline-offset:-2px}
+.gcal button .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;max-width:30px}
+.gcal button .dots i{width:6px;height:6px;border-radius:50%}
+.hbtns{display:flex;gap:8px;margin-top:14px}
+.hbtn{flex:1;height:46px;border-radius:14px;background:var(--raise2);font-weight:700;font-size:14px;color:var(--muted)}
+.hbtn.yes.on{background:var(--plus);color:#000}
+.hbtn.no.on{background:var(--danger);color:#fff}
 .aibox{background:var(--raise2);border-radius:18px;padding:14px;margin-top:8px}
 .aibox .inp{background:var(--raise);margin-top:8px}
 .aibox .pills .pill{background:var(--raise)}
@@ -477,6 +495,20 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       </div>
 
       <div class="card">
+        <div class="ch"><b>Кардио</b><span id="cardWeek"></span></div>
+        <div class="bigv num" id="cardVal"></div>
+        <div class="hbtns"><button class="hbtn yes" id="cardYes">Делал кардио</button><button class="hbtn no" id="cardNo">Не делал</button></div>
+        <div class="sdots" id="cardDots"></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><b>Воздержание</b><span id="absBest"></span></div>
+        <div class="bigv num" id="absVal"></div>
+        <div class="hbtns"><button class="hbtn yes" id="absYes">Воздерживался</button><button class="hbtn no" id="absNo">Не воздерживался</button></div>
+        <div class="sdots" id="absDots"></div>
+      </div>
+
+      <div class="card">
         <div class="ch"><b>Питание</b><span id="fCount"></span></div>
         <div class="macros" id="macros"></div>
         <div id="foodList"></div>
@@ -491,6 +523,26 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
         </div>
         <div class="sleepv"><b class="num" id="sHours">—</b><span id="sNote"></span></div>
         <div class="mini" id="sWeek"></div>
+      </div>
+    </section>
+
+    <section class="view" id="v-gym">
+      <div class="brand">Life of CEO</div>
+      <div class="daynav"><b id="gMonth"></b><div class="arrs">
+        <button data-gshift="-1" aria-label="Предыдущий месяц"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button data-gshift="1" aria-label="Следующий месяц"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div></div>
+      <div class="card">
+        <div class="ch"><b id="gDay"></b><span id="gDayNote"></span></div>
+        <div class="mchips" id="gChips"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><b>Календарь тренировок</b><span id="gCount"></span></div>
+        <div class="gcal" id="gCal"></div>
+      </div>
+      <div class="card">
+        <div class="ch"><b>За месяц</b><span>раз · последний</span></div>
+        <div id="gStats"></div>
       </div>
     </section>
 
@@ -547,6 +599,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     <button class="tab on" data-view="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>День</button>
     <button class="tab" data-view="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></svg>Ассистент</button>
     <button class="tab" data-view="health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5s6.5 7.2 6.5 12a6.5 6.5 0 0 1-13 0c0-4.8 6.5-12 6.5-12z"/></svg>Здоровье</button>
+    <button class="tab" data-view="gym"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>Зал</button>
     <button class="tab" data-view="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/></svg>Траты</button>
     <button class="tab" data-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Итоги</button>
   </nav>
@@ -749,6 +802,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   let state = load();
   if (!state){ state = fresh(); save(); }
   state.reflect ||= {};
+  state.gym ||= {}; state.cardio ||= {}; state.abstain ||= {}; state.sysDone ||= {};
   state.settings.ai ||= { provider:'yandex', key:'', folder:'', base:'', model:'qwen3.6-35b-a3b' };
 
   let sel = todayKey(), monthCursor = fromKey(sel), monthOpen = false, view = 'day';
@@ -758,12 +812,24 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     const wd = fromKey(k).getDay(), out = [];
     for (const t of state.tasks) if (t.date===k) out.push({kind:'task', ref:t, id:t.id, title:t.title, time:t.time, dur:t.dur||60, part:t.part||'День', cat:t.cat, remind:t.remind!==false, done:!!t.done, pinned:false});
     for (const r of state.routines) if (r.from<=k && r.days.includes(wd) && !state.skips[r.id+'|'+k]) out.push({kind:'routine', ref:r, id:r.id, title:r.title, time:r.time, dur:r.dur||60, part:r.part||'День', cat:r.cat, remind:r.remind!==false, done:!!state.rdone[r.id+'|'+k], pinned:true});
+    const rs = resignSlot();
+    if (rs && rs.date===k) out.push({kind:'sys', ref:null, id:'sys-resign', title:'Переустановить Life of CEO через компьютер (iloader)', time:rs.time, dur:15, part:partOf(rs.time), cat:'Личное', remind:false, done:!!state.sysDone['sys-resign|'+window.__SIGN_EXPIRY__], pinned:false});
     return out;
+  }
+  // когда переустанавливать: за сутки до конца подписи, но не раньше сегодняшнего дня
+  function resignSlot(){
+    const exp = window.__SIGN_EXPIRY__; if (!exp) return null;
+    let at = exp - 24*3600e3;
+    if (at < Date.now()) at = Math.min(exp - 15*60e3, Date.now() + 5*60e3);
+    if (at > exp) return null;
+    const d = new Date(at); d.setMinutes(Math.floor(d.getMinutes()/5)*5);
+    return { date: key(d), time: fromMin(d.getHours()*60 + d.getMinutes()) };
   }
   const timed = k => itemsOn(k).filter(i=>i.time).sort((a,b)=>toMin(a.time)-toMin(b.time));
   const untimed = k => itemsOn(k).filter(i=>!i.time);
   function setDone(item, k, val){
-    if (item.kind==='routine'){ const kk = item.id+'|'+k; if (val) state.rdone[kk] = true; else delete state.rdone[kk]; }
+    if (item.kind==='sys'){ const kk = item.id+'|'+window.__SIGN_EXPIRY__; if (val) state.sysDone[kk] = true; else delete state.sysDone[kk]; }
+    else if (item.kind==='routine'){ const kk = item.id+'|'+k; if (val) state.rdone[kk] = true; else delete state.rdone[kk]; }
     else item.ref.done = val;
     item.done = val; save();
   }
@@ -806,6 +872,19 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     let d = state.sugar[t]==='clean' ? t : shiftKey(t,-1), n = 0;
     while (state.sugar[d]==='clean'){ n++; d = shiftKey(d,-1); }
     return n;
+  }
+  function absStreak(){
+    const t = todayKey();
+    if (state.abstain[t]==='no') return 0;
+    let d = state.abstain[t]==='yes' ? t : shiftKey(t,-1), n = 0;
+    while (state.abstain[d]==='yes'){ n++; d = shiftKey(d,-1); }
+    return n;
+  }
+  function absBest(){
+    const ks = Object.keys(state.abstain).filter(k=>state.abstain[k]==='yes').sort();
+    let best = 0, run = 0, prev = null;
+    for (const k of ks){ run = (prev && shiftKey(prev,1)===k) ? run+1 : 1; best = Math.max(best, run); prev = k; }
+    return best;
   }
   function sugarBest(){
     const ks = Object.keys(state.sugar).filter(k=>state.sugar[k]==='clean').sort();
@@ -986,7 +1065,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       return;
     }
     const ed = e.target.closest('[data-edit]');
-    if (ed){ const it = findItem(ed.dataset.edit, sel); if (it) openTask(it); }
+    if (ed){ const it = findItem(ed.dataset.edit, sel); if (it && it.kind==='sys'){ notify('Подключи iPhone к компьютеру, открой iloader и установи свежий LifeOfCEO.ipa. Данные сохранятся.'); return; } if (it) openTask(it); }
   }
   $('timeline').addEventListener('click', onListClick);
   $('checklist').addEventListener('click', onListClick);
@@ -1127,6 +1206,22 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     const mon = mondayOf(fromKey(hSel));
     $('sugWeek').innerHTML = [...Array(7)].map((_,i)=>{ const k = key(addDays(mon,i)); return `<div class="${k===hSel?'cur':''}"><i class="${state.sugar[k]||''}"></i><span>${WD[i]}</span></div>`; }).join('');
 
+    // кардио
+    const cw = mondayOf(fromKey(hSel)), cks = [...Array(7)].map((_,i)=>key(addDays(cw,i)));
+    const cCount = cks.filter(k=>state.cardio[k]===true).length, cMark = state.cardio[hSel];
+    $('cardVal').innerHTML = `${cCount} <small>${plural(cCount,'раз','раза','раз')} за неделю</small>`;
+    $('cardWeek').textContent = cMark===true ? 'сегодня было' : '';
+    $('cardYes').classList.toggle('on', cMark===true); $('cardNo').classList.toggle('on', cMark===false);
+    $('cardYes').textContent = cMark===true ? 'Делал кардио ✓' : 'Делал кардио';
+    $('cardDots').innerHTML = cks.map((k,i)=>`<div class="${k===hSel?'cur':''}"><i class="${state.cardio[k]===true?'clean':state.cardio[k]===false?'ate':''}"></i><span>${WD[i]}</span></div>`).join('');
+    // воздержание
+    const ast = absStreak(), aMark = state.abstain[hSel], ab = absBest();
+    $('absVal').innerHTML = ast ? `${ast} <small>${plural(ast,'день','дня','дней')} подряд</small>` : `0 <small>дней подряд</small>`;
+    $('absBest').textContent = ab ? `рекорд ${days(ab)}` : '';
+    $('absYes').classList.toggle('on', aMark==='yes'); $('absNo').classList.toggle('on', aMark==='no');
+    $('absYes').textContent = aMark==='yes' ? 'Воздерживался ✓' : 'Воздерживался';
+    $('absDots').innerHTML = cks.map((k,i)=>`<div class="${k===hSel?'cur':''}"><i class="${state.abstain[k]==='yes'?'clean':state.abstain[k]==='no'?'ate':''}"></i><span>${WD[i]}</span></div>`).join('');
+
     const ft = foodTotals(hSel), fl = foodOn(hSel);
     $('fCount').textContent = fl.length ? `${fl.length} ${plural(fl.length,'запись','записи','записей')}` : '';
     $('macros').innerHTML = [[fmtNum(ft.kcal),'ккал'],[fmtNum(ft.p,1),'белки, г'],[fmtNum(ft.f,1),'жиры, г'],[fmtNum(ft.c,1),'углев., г']].map(([v,l])=>`<div class="macro"><b>${v}</b><span>${l}</span></div>`).join('');
@@ -1148,6 +1243,19 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
   $('wMinus').onclick = () => waterTap(-250);
   $('sugClean').onclick = () => { const m = markSugar(hSel,'clean'); renderHealth(); if (state.sugar[hSel]) notify(m); };
   $('sugAte').onclick = () => { const m = markSugar(hSel,'ate'); renderHealth(); if (state.sugar[hSel]) notify(m); };
+  function setCardio(k, v){ if (state.cardio[k]===v) delete state.cardio[k]; else state.cardio[k] = v; save(); }
+  function setAbstain(k, v){
+    const before = absStreak();
+    if (state.abstain[k]===v) delete state.abstain[k]; else state.abstain[k] = v; save();
+    const n = absStreak();
+    if (state.abstain[k]==='yes') return n===1 ? 'Первый день воздержания.' : `Воздержание: ${days(n)} подряд.`;
+    if (state.abstain[k]==='no') return before ? `Серия обнулилась, было ${days(before)}.` : 'Записал.';
+    return 'Снял отметку.';
+  }
+  $('cardYes').onclick = () => { setCardio(hSel, true); renderHealth(); if (state.cardio[hSel]===true){ haptic('light'); notify('Кардио отмечено.'); } };
+  $('cardNo').onclick = () => { setCardio(hSel, false); renderHealth(); };
+  $('absYes').onclick = () => { const m = setAbstain(hSel,'yes'); renderHealth(); if (state.abstain[hSel]) notify(m); };
+  $('absNo').onclick = () => { const m = setAbstain(hSel,'no'); renderHealth(); if (state.abstain[hSel]) notify(m); };
   $('sBed').onchange = e => { hab(hSel).bed = e.target.value; save(); renderHealth(); };
   $('sWake').onchange = e => { hab(hSel).wake = e.target.value; save(); renderHealth(); };
   $('foodAddBtn').onclick = () => { ['foodName','foodG','foodK','foodP','foodF','foodC'].forEach(id=>$(id).value=''); openSheet($('foodSheet')); setTimeout(()=>$('foodName').focus(),280); };
@@ -1158,6 +1266,55 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     closeSheet(); renderHealth();
   };
   $('foodList').onclick = e => { const b = e.target.closest('[data-fdel]'); if (b){ state.food[hSel] = foodOn(hSel).filter(x=>x.id!==b.dataset.fdel); save(); renderHealth(); } };
+
+  // ---------- экран «Зал» ----------
+  const MUSCLES = [['Спина','#3d63ff'],['Грудь','#ff5c7a'],['Плечи','#ffb020'],['Бицепс','#38d27a'],['Трицепс','#2ec5d3'],['Ноги','#a66bff'],['Предплечья','#ff8a3d']];
+  const MCOLOR = Object.fromEntries(MUSCLES);
+  let gSel = todayKey(), gMonth = ymOf(todayKey());
+  const gymOn = k => state.gym[k] || [];
+  function toggleMuscle(k, m, val){
+    const cur = new Set(gymOn(k));
+    if (val === undefined) val = !cur.has(m);
+    if (val) cur.add(m); else cur.delete(m);
+    const arr = MUSCLES.map(x=>x[0]).filter(x=>cur.has(x));
+    if (arr.length) state.gym[k] = arr; else delete state.gym[k];
+    save();
+  }
+  function lastTrained(m, before){
+    for (let i=0;i<120;i++){ const k = shiftKey(before,-i); if (gymOn(k).includes(m)) return i; }
+    return null;
+  }
+  function renderGym(){
+    $('gMonth').textContent = cap(ymTitle(gMonth));
+    $('gDay').textContent = cap(dayLabel(gSel,false)) + (gSel===todayKey() ? ' в зале' : '');
+    const today = gymOn(gSel);
+    $('gDayNote').textContent = today.length ? `${today.length} ${plural(today.length,'группа','группы','групп')}` : 'нажми, что тренировал';
+    $('gChips').innerHTML = MUSCLES.map(([m,c])=>`<button class="mchip ${today.includes(m)?'on':''}" style="--mc:${c}" data-m="${m}"><i></i>${m}</button>`).join('');
+    const ks = monthKeys(gMonth), start = mondayOf(fromKey(ks[0])), t = todayKey();
+    let html = WD.map(w=>`<span class="wd">${w}</span>`).join('');
+    for (let i=0;i<42;i++){
+      const d = addDays(start,i), k = key(d);
+      if (i>=35 && ymOf(k)!==gMonth) break;
+      const g = gymOn(k);
+      html += `<button class="${ymOf(k)!==gMonth?'other':''} ${k===t?'today':''} ${k===gSel?'sel':''}" data-gk="${k}"><span class="n">${d.getDate()}</span><span class="dots">${g.map(m=>`<i style="background:${MCOLOR[m]}"></i>`).join('')}</span></button>`;
+    }
+    $('gCal').innerHTML = html;
+    const mDays = ks.filter(k=>gymOn(k).length);
+    $('gCount').textContent = mDays.length ? `${mDays.length} ${plural(mDays.length,'тренировка','тренировки','тренировок')}` : '';
+    const ref = gMonth===ymOf(t) ? t : ks[ks.length-1];
+    $('gStats').innerHTML = MUSCLES.map(([m,c])=>{
+      const n = ks.filter(k=>gymOn(k).includes(m)).length, last = lastTrained(m, ref);
+      const lt = last===null ? '—' : last===0 ? 'сегодня' : last===1 ? 'вчера' : `${days(last)} назад`;
+      return `<div class="catrow"><div class="tp"><span style="color:var(--text);display:inline-flex;align-items:center;gap:8px"><i style="width:9px;height:9px;border-radius:50%;background:${c};display:inline-block"></i>${m}</span><span><b>${n}</b> · ${lt}</span></div></div>`;
+    }).join('');
+  }
+  $('gChips').onclick = e => { const b = e.target.closest('[data-m]'); if (!b) return; toggleMuscle(gSel, b.dataset.m); haptic('light'); renderGym(); };
+  $('gCal').onclick = e => { const b = e.target.closest('[data-gk]'); if (!b) return; gSel = b.dataset.gk; gMonth = ymOf(gSel); renderGym(); };
+  document.querySelector('#v-gym .arrs').onclick = e => {
+    const b = e.target.closest('[data-gshift]'); if (!b) return;
+    const [y,m] = gMonth.split('-').map(Number), d = new Date(y, m-1 + (+b.dataset.gshift), 1);
+    gMonth = `${d.getFullYear()}-${pad(d.getMonth()+1)}`; renderGym();
+  };
 
   // ---------- экран «Траты» ----------
   let mPeriod = 'month', mAnchor = todayKey(), mCat = 'Еда';
@@ -1236,6 +1393,9 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     const x = xp();
     $('cats').innerHTML = `
       <div class="kv">Потрачено за неделю<span>${rub(wSpend)}</span></div>
+      <div class="kv">Тренировок в зале<span>${weekKs.filter(k=>gymOn(k).length).length}</span></div>
+      <div class="kv">Кардио<span>${weekKs.filter(k=>state.cardio[k]===true).length} ${plural(weekKs.filter(k=>state.cardio[k]===true).length,'раз','раза','раз')}</span></div>
+      <div class="kv">Воздержание подряд<span>${days(absStreak())}</span></div>
       <div class="kv">Калорий в день, в среднем<span>${kcal ? fmtNum(kcal) : '—'}</span></div>
       <div class="kv">Серия дней с делами<span>${days(streak())}</span></div>
       <div class="kv">Уровень<span>${Math.floor(x/100)+1}, до следующего ${100 - x%100} XP</span></div>`;
@@ -1650,6 +1810,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       const pd = parseDay(s);
       const found = findTarget(q, pd);
       if (!found) return { text:`Не нашёл задачу «${q.trim()}». Проверь название.` };
+      if (found.item.kind==='sys') return { text:'Эту задачу приложение ставит само: она пропадёт после переустановки через компьютер.' };
       const {item} = found;
       if (item.kind==='routine'){
         if (/только/.test(s) || pd){ const d = pd || todayKey(); state.skips[item.id+'|'+d] = true; save(); sel = d; return { text:`Убрал ${taskWord(item)} только на ${dayLabel(d,false)}. Закреплённая задача осталась.` }; }
@@ -1728,6 +1889,16 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       if (!unmark && !left){ const fm = allDoneCheck(d, false); if (fm){ state.chat.pop(); save(); return { text:`Отметил «${best.title}». ${fm}` }; } }
       return { text: unmark ? `Снял отметку с «${best.title}».` : `Отметил «${best.title}». ${left ? `Осталось ${left}.` : 'День закрыт.'}` };
     }
+
+    // зал, кардио, воздержание
+    const MSTEM = [['Спина','спин'],['Грудь','груд'],['Плечи','плеч'],['Бицепс','бицеп'],['Трицепс','трицеп'],['Ноги','ног'],['Предплечья','предплеч']];
+    const msHit = MSTEM.filter(([m,st]) => new RegExp('(^|\\s)'+st).test(s) && !(m==='Плечи' && /предплеч/.test(s) && !/(^|\s)плеч/.test(s.replace(/предплеч\S*/g,''))));
+    if (msHit.length && /(делал|тренировал|качал|зал|сегодня|вчера|был[аи]?\s)/.test(s) && !isQ){
+      msHit.forEach(([m]) => toggleMuscle(day, m, true));
+      return { text:`Отметил в «Зале» за ${dayLabel(day,false)}: ${gymOn(day).join(', ')}.` };
+    }
+    if (/кардио/.test(s) && !isQ){ const v = !/(не делал|не было|без кардио)/.test(s); state.cardio[day] = v; save(); return { text: v ? `Кардио за ${dayLabel(day,false)} отмечено.` : 'Записал: кардио не было.' }; }
+    if (/воздерж/.test(s) && !isQ){ const v = /(не воздерж|сорвал)/.test(s) ? 'no' : 'yes'; state.abstain[day] = v; save(); return { text: v==='yes' ? `Воздержание: ${days(absStreak())} подряд.` : 'Записал. Серия воздержания обнулилась.' }; }
 
     // сахар
     if (/без сахара/.test(s) && !/(съел|сорвал)/.test(s)) return { text: markSugarSet(day,'clean') };
@@ -2007,7 +2178,10 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       free_today: freeWindows(t).map(([a,b]) => `${fromMin(a)}–${fromMin(b)}`),
       health_today: { water_ml: h.ml||0, sleep: sleepMin(t) ? fmtDur(sleepMin(t)) : null, bed:h.bed||null, wake:h.wake||null,
         food: foodOn(t).map((x,i)=>({ index:i, name:x.name, g:x.g||null, kcal:x.kcal||null, p:x.p||null, f:x.f||null, c:x.c||null })), food_totals: foodTotals(t),
-        sugar_today: state.sugar[t] || null, sugar_streak_days: sugarStreak(), sugar_best: sugarBest() },
+        sugar_today: state.sugar[t] || null, sugar_streak_days: sugarStreak(), sugar_best: sugarBest(),
+        cardio_today: state.cardio[t] ?? null, cardio_this_week: [...Array(7)].map((_,i)=>key(addDays(mondayOf(d),i))).filter(k=>state.cardio[k]===true).length,
+        abstain_today: state.abstain[t] || null, abstain_streak_days: absStreak() },
+      gym_last_14_days: Object.fromEntries([...Array(14)].map((_,i)=>shiftKey(t,-i)).filter(k=>gymOn(k).length).map(k=>[k, gymOn(k)])),
       reflection_recent: Object.fromEntries([0,1,2].map(i=>shiftKey(t,-i)).filter(k=>state.reflect[k]).map(k=>[k, state.reflect[k]])),
       spend: { today_total: Math.round(total(spendIn([t]))), week_total: Math.round(total(spendIn(wk))), week_by_cat: catObj(spendIn(wk)),
         month_total: Math.round(total(spendIn(mk))), month_by_cat: catObj(spendIn(mk)),
@@ -2034,6 +2208,9 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
 - {"type":"set_sleep","date"?,"bed":"HH:MM","wake":"HH:MM"}
 - {"type":"add_food","name":"...","g"?,"kcal"?,"p"?,"f"?,"c"?,"date"?} — p/f/c это белки/жиры/углеводы в граммах. Если пользователь не дал цифры, оцени сам по типичным значениям.
 - {"type":"delete_food","index":число,"date"?}
+- {"type":"gym","muscles":["Спина|Грудь|Плечи|Бицепс|Трицепс|Ноги|Предплечья"],"date"?,"replace"?:true} — отметить, какие мышцы тренировал в зале (replace=true заменяет отметки дня).
+- {"type":"cardio","done":true|false,"date"?}
+- {"type":"abstain","value":"yes|no","date"?} — воздерживался ли сегодня (серия дней).
 - {"type":"sugar","value":"clean|ate","date"?} — clean = день без сахара, ate = был сахар (серия обнуляется). Сладкая еда = ate.
 - {"type":"add_spend","amt":число,"cat":"Еда|Транспорт|Жильё|Учёба|Спорт|Развлечения|Покупки|Другое","note"?,"date"?}
 - {"type":"delete_spend","id":"..."}
@@ -2134,6 +2311,15 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
             else { state.tasks = state.tasks.filter(x=>x.id!==f.ref.id); log.push({l:'—', t:`${f.ref.title} · удалено`}); }
             break;
           }
+          case 'gym': {
+            const ms = (Array.isArray(a.muscles) ? a.muscles : []).map(x => MUSCLES.map(m=>m[0]).find(m => m.toLowerCase().startsWith(String(x).toLowerCase().slice(0,4)))).filter(Boolean);
+            if (!ms.length) break;
+            if (a.replace) delete state.gym[date];
+            ms.forEach(m => toggleMuscle(date, m, true));
+            log.push({l:'Зал', t:`${dayLabel(date,false)}: ${gymOn(date).join(', ')}`}); break;
+          }
+          case 'cardio': { const v = a.done !== false; state.cardio[date] = v; log.push({l:'Кардио', t: v ? 'было' : 'не было'}); break; }
+          case 'abstain': { const v = a.value==='no' ? 'no' : 'yes'; state.abstain[date] = v; log.push({l:'Воздерж.', t: v==='yes' ? `серия ${days(absStreak())}` : 'серия обнулилась'}); break; }
           case 'set_done': {
             const it = itemsOn(date).find(x=>x.id===a.id); if (!it) break;
             setDone(it, date, a.done !== false); log.push({l: a.done !== false ? '✓' : '○', t: it.title});
@@ -2253,6 +2439,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     if (view==='stats') renderStats();
     if (view==='health') renderHealth();
     if (view==='money') renderMoney();
+    if (view==='gym') renderGym();
     if (view==='ai') renderChat();
     $('screen').scrollTop = view==='ai' ? $('screen').scrollHeight : 0;
   });
@@ -2284,9 +2471,9 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     const left = exp - Date.now(), d = new Date(exp);
     const when = `${d.getDate()} ${MONTHS_G[d.getMonth()]} в ${fromMin(d.getHours()*60+d.getMinutes())}`;
     $('signBox').classList.remove('hide');
-    $('signInfo').innerHTML = `Подпись действует до <b>${when}</b>. Обновляй её в SideStore («Refresh All» с включённым LocalDevVPN) раньше этого времени — данные при этом сохраняются.`;
+    $('signInfo').innerHTML = `Подпись действует до <b>${when}</b>. До этого времени подключи iPhone к компьютеру и заново установи свежий <b>LifeOfCEO.ipa</b> через iloader — данные сохранятся. Задача уже стоит в расписании.`;
     const k = 'sign|' + todayKey();
-    if (left < 48*3600e3 && !state.notified[k]){ state.notified[k] = true; save(); notify(`Подпись приложения истекает ${when}. Открой SideStore и нажми «Refresh All».`); }
+    if (left < 48*3600e3 && !state.notified[k]){ state.notified[k] = true; save(); notify(`Подпись приложения истекает ${when}. Переустанови Life of CEO через iloader на компьютере.`); }
   }
   window.__onForeground = () => { renderAll(); checkMonthly(); checkReminders(); scheduleSync(); signCheck(); };
   window.__openReflect = () => { closeSheet(); openReflect(reflectDayKey()); };
@@ -2318,8 +2505,8 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     // подпись приложения: напомнить обновить SideStore
     const exp = window.__SIGN_EXPIRY__;
     if (exp){
-      out.push({ at: exp - 36*3600e3, title:'Обнови SideStore', body:'Через полтора дня приложение перестанет открываться. Включи LocalDevVPN и нажми в SideStore «Refresh All».' });
-      out.push({ at: exp - 6*3600e3, title:'Обнови SideStore сегодня', body:'Осталось несколько часов. Включи LocalDevVPN и нажми в SideStore «Refresh All».' });
+      out.push({ at: exp - 36*3600e3, title:'Переустанови приложение', body:'Через полтора дня Life of CEO перестанет открываться. Подключи iPhone к компьютеру и установи свежий LifeOfCEO.ipa через iloader.' });
+      out.push({ at: exp - 6*3600e3, title:'Переустанови приложение сегодня', body:'Осталось несколько часов. Подключи iPhone к компьютеру и установи LifeOfCEO.ipa через iloader.' });
     }
     // отчёт по тратам 1-го числа в 00:01
     const n = new Date(), first = new Date(n.getFullYear(), n.getMonth()+1, 1, 0, 1, 0, 0);
