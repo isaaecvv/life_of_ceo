@@ -199,7 +199,7 @@ export default function App() {
         case 'ai': {
           // Запрос к ИИ делаем из нативной части: здесь нет ограничений браузера (CORS)
           const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), 70000);
+          const timer = setTimeout(() => ctrl.abort(), 125000);
           let ok = false;
           let status = 0;
           let text = '';

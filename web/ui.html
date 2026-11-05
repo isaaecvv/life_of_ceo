@@ -2121,11 +2121,11 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       const model = a.model.startsWith('gpt://') ? a.model : `gpt://${a.folder}/${a.model}`;
       return { url:'https://ai.api.cloud.yandex.net/v1/chat/completions',
         headers:{ 'Content-Type':'application/json', 'Authorization':`Api-Key ${a.key}`, 'OpenAI-Project': a.folder },
-        body:{ model, messages, temperature:0.2, max_tokens:2000 } };
+        body:{ model, messages, temperature:0.2, max_tokens:8000 } };
     }
     return { url: a.base.replace(/\/+$/,'') + '/chat/completions',
       headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${a.key}` },
-      body:{ model:a.model, messages, temperature:0.2, max_tokens:2000 } };
+      body:{ model:a.model, messages, temperature:0.2, max_tokens:8000 } };
   }
   // сетевой запрос: в приложении его делает нативная часть (без ограничений браузера)
   const aiWaiters = {};
@@ -2136,7 +2136,7 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
       return new Promise(resolve => {
         aiWaiters[id] = resolve;
         post({type:'ai', id, url:req.url, headers:req.headers, body:JSON.stringify(req.body)});
-        setTimeout(()=>{ if (aiWaiters[id]){ delete aiWaiters[id]; resolve({ok:false, status:0, text:'timeout'}); } }, 75000);
+        setTimeout(()=>{ if (aiWaiters[id]){ delete aiWaiters[id]; resolve({ok:false, status:0, text:'timeout'}); } }, 130000);
       });
     }
     return fetch(req.url, {method:'POST', headers:req.headers, body:JSON.stringify(req.body)})
@@ -2248,13 +2248,14 @@ textarea.field{resize:none;min-height:130px;line-height:1.45;font-size:16px}
     const messages = [
       { role:'system', content: AI_SYSTEM + '\n\nCONTEXT ' + JSON.stringify(aiContext()) },
       ...history,
-      { role:'user', content: userContent },
+      { role:'user', content: typeof userContent === 'string' ? userContent + ' /no_think' : userContent },
     ];
     const r = await httpPost(aiRequest(messages));
     if (!r.ok) return { error: httpError(r) };
-    let content = '';
-    try { const j = JSON.parse(r.text); content = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : ''; if (Array.isArray(content)) content = content.map(c => c.text || '').join(''); }
+    let content = '', finish = '';
+    try { const j = JSON.parse(r.text); content = j.choices && j.choices[0] && j.choices[0].message ? j.choices[0].message.content : ''; if (Array.isArray(content)) content = content.map(c => c.text || '').join(''); finish = j.choices && j.choices[0] ? j.choices[0].finish_reason : ''; }
     catch(e){ return { error: 'непонятный ответ сервиса' }; }
+    if (!content || !String(content).trim()) return { error: finish==='length' ? 'ответ не уместился, попробуй короче' : 'пустой ответ модели' };
     const out = parseAIJson(content);
     const list = runActions(out.actions);
     return { reply: out.reply || (list.length ? 'Готово.' : 'Не понял, уточни.'), list };
