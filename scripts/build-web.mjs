@@ -1,6 +1,6 @@
 // Собирает интерфейс (web/ui.html) в одну строку со встроенными шрифтами.
 // Результат: src/webHtml.ts (для приложения) и web/dist/index.html (для просмотра в браузере).
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -26,11 +26,18 @@ for (const [family, file, weights] of FAMILIES) {
   }
 }
 
-const html = readFileSync(join(root, 'web', 'ui.html'), 'utf8').replace('/*@@FONTS@@*/', css);
+const html = readFileSync(join(root, 'web', 'ui.html'), 'utf8').replace('/*@@FONTS@@*/', css).replace('<!--@@PWA@@-->', '');
+// Веб-версия (экран «Домой» в Safari): манифест, иконка и офлайн-кэш
+const PWA = `<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-title" content="Life of CEO">
+<script>if('serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>`;
+const webHtml = readFileSync(join(root, 'web', 'ui.html'), 'utf8').replace('/*@@FONTS@@*/', css).replace('<!--@@PWA@@-->', PWA);
 if (html.includes('fonts.googleapis.com')) throw new Error('В интерфейсе остались внешние шрифты');
 
 mkdirSync(join(root, 'web', 'dist'), { recursive: true });
-writeFileSync(join(root, 'web', 'dist', 'index.html'), html);
+writeFileSync(join(root, 'web', 'dist', 'index.html'), webHtml);
+for (const f of readdirSync(join(root, 'web', 'pwa'))) copyFileSync(join(root, 'web', 'pwa', f), join(root, 'web', 'dist', f));
 writeFileSync(
   join(root, 'src', 'webHtml.ts'),
   `// Сгенерировано scripts/build-web.mjs из web/ui.html — не править вручную.\nexport const WEB_HTML: string = ${JSON.stringify(html)};\n`,
